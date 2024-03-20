@@ -36,11 +36,18 @@ async def application_step_one(message: Message, state: FSMContext):
     lambda message: message.text.isdigit() and len(message.text) == 10,
     NewApplication.inn_payer
 )
-async def handle_ten_digit_number(message: types.Message, state: FSMContext):
+async def get_inn_payer(message: types.Message, state: FSMContext):
     # Обработка сообщения с числом из ровно 10 символов
     number = message.text
-    await message.answer(f"Вы ввели число из 10 символов: {number}")
+    await message.answer(f"Вы ввели ИНН: {number}")
     await state.set_state(NewApplication.inn_recipient)
+
+
+@router.message(F.text, NewApplication.inn_payer)
+async def invalid_values_inn_payer(message: types.Message, state: FSMContext):
+    await message.answer("Внимание\\! ИНН должен содержать 10 цифр\\!")
+    await message.answer(MESSAGES["step1"])
+    await state.set_state(NewApplication.inn_payer)
 
 
 @router.message(F.text.lower() == "мои заявки")
