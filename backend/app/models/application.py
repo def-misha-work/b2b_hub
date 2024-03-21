@@ -1,35 +1,26 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, DateTime, Float
 
 from backend.constants import (
     CREATE_DATE_DEFAULT,
-    COMPANY_ID_FOREIGN_KEY, COMPANY_INN_FOREIGN_KEY,
 )
 from backend.app.core.db import Base
 
 
 class Application(Base):
     """Модель заявки."""
-    # будет подставляться на этапе endpoints
-    company_id = Column(
-        Integer,
-        ForeignKey(COMPANY_ID_FOREIGN_KEY),
-        unique=False,
-        nullable=False,
-    )
-    inn = Column(
-        Integer,
-        ForeignKey(COMPANY_INN_FOREIGN_KEY),
-        unique=True,
-    )
-    created = Column(
+    # Дата создания заявки
+    create_date = Column(
         DateTime,
         default=CREATE_DATE_DEFAULT,
     )
+    # Ожидаемая дата выполнения заявки
     target_date = Column(
         DateTime,
         nullable=False,
     )
+    # Сумма заявки
     cost = Column(
         Float,
         nullable=False,
     )
+    # user_id = Column(Integer, ForeignKey('user.id'))
