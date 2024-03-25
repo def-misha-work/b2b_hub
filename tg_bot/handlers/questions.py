@@ -6,15 +6,17 @@ from aiogram.types import Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
+
 from keyboards.for_questions import get_menu
 from requests import make_post_request
 from storage import UserStorage, ApplicationStorage
 from utils import send_message
+from validators import validate_date
 from constants import MESSAGES, ENDPONT_CREATE_USER, SERVICE_CHAT_ID
 
 
 router = Router()
-appl_storage = ApplicationStorage()
+application_storage = ApplicationStorage()
 
 
 class NewApplication(StatesGroup):
@@ -57,6 +59,7 @@ async def cmd_start(message: Message, state: FSMContext):
 @router.message(StateFilter(None), F.text.lower() == "новая заявка")
 async def application_step_one(message: Message, state: FSMContext):
     """Обрабатывает клик по кнопке и запускает цепочку Новая заявка."""
+    application_storage.update_tg_id(message.from_user.id)
     await message.answer(MESSAGES["step1"])
     await state.set_state(NewApplication.step_1)
 
@@ -68,8 +71,9 @@ async def application_step_one(message: Message, state: FSMContext):
 )
 async def get_inn_payer(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 10 символов."""
-    number = message.text
-    await message.answer(f"Вы ввели ИНН плательщика: {number}")
+    inn_payer = message.text
+    application_storage.update_inn_payer(inn_payer)
+    await message.answer(f"Вы ввели ИНН плательщика: {inn_payer}")
     await message.answer(MESSAGES["step2"])
     await state.set_state(NewApplication.step_2)
 
@@ -89,14 +93,18 @@ async def invalid_values_inn_payer(message: types.Message, state: FSMContext):
 )
 async def get_inn_recipient(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 12 символов."""
-    number = message.text
-    await message.answer(f"Вы ввели ИНН получателя: {number}")
+    inn_recipient = message.text
+    application_storage.update_inn_recipient(inn_recipient)
+    await message.answer(f"Вы ввели ИНН получателя: {inn_recipient}")
     await message.answer(MESSAGES["step3"])
     await state.set_state(NewApplication.step_3)
 
 
 @router.message(F.text, NewApplication.step_2)
-async def invalid_values_inn_recipient(message: types.Message, state: FSMContext):
+async def invalid_values_inn_recipient(
+    message: types.Message,
+    state: FSMContext
+):
     """Валидация сообщения с числом из 12 символов."""
     await message.answer("Внимание! ИНН ИП должен содержать 12 цифр!")
     await message.answer(MESSAGES["step2"])
@@ -109,28 +117,62 @@ async def invalid_values_inn_recipient(message: types.Message, state: FSMContext
     NewApplication.step_3
 )
 async def get_application_cost(message: types.Message, state: FSMContext):
-    """Обработка сообщения с числом."""
-    number = message.text
-    await message.answer(f"Вы ввели сумму заявки: {number}")
+    """Обработка сообщения с суммой заявки."""
+    application_cost = message.text
+    application_storage.update_application_cost(application_cost)
+    await message.answer(f"Вы ввели сумму заявки: {application_cost}")
     await message.answer(MESSAGES["step4"])
     await state.set_state(NewApplication.step_4)
 
 
 @router.message(F.text, NewApplication.step_3)
-async def invalid_values_application_cost(message: types.Message, state: FSMContext):
+async def invalid_values_application_cost(
+    message: types.Message,
+    state: FSMContext
+):
     """Валидация сообщения с числом из 12 символов."""
     await message.answer("Внимание! Сумма должна быть числом!")
     await message.answer(MESSAGES["step3"])
     await state.set_state(NewApplication.step_3)
 
 
+# Обработка target_date step_4
+@router.message(
+    lambda message: validate_date(message.text),
+    NewApplication.step_4
+)
+async def get_target_date(message: types.Message, state: FSMContext):
+    """Обработка сообщения с датой в формате 20.10.25."""
+    target_date = message.text
+    application_storage.update_target_date(target_date)
+    application_info = MESSAGES["application"].format(
+        application_storage.tg_id,
+        application_storage.inn_payer,
+        application_storage.inn_recipient,
+        application_storage.application_cost,
+        application_storage.target_date
+    )
+    await message.answer(application_info)
+    await message.answer(MESSAGES["application_created"])
+    await state.set_state(None)
+    await message.answer(MESSAGES["menu"], reply_markup=get_menu())
+
+
+@router.message(F.text, NewApplication.step_4)
+async def invalid_values_target_date(message: types.Message, state: FSMContext):
+    """Валидация даты."""
+    await message.answer("Внимание! Дата должна быть в формате: 20.10.25, и не ранее текущего дня.")
+    await message.answer(MESSAGES["step4"])
+    await state.set_state(NewApplication.step_4)
+
+
 @router.message(F.text.lower() == "мои заявки")
 async def answer_no(message: Message):
     """Обрабатывает клик по кнопке."""
-    await message.answer("Жаль\\.\\.\\.")
+    await message.answer("Жаль")
 
 
 @router.message(F.text.lower() == "мои юр. лица")
 async def answer_no1(message: Message):
     """Обрабатывает клик по кнопке."""
-    await message.answer("Чтото\\.\\.\\.")
+    await message.answer("Чтото")
