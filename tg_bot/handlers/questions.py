@@ -8,12 +8,12 @@ from aiogram.fsm.context import FSMContext
 
 
 from keyboards.for_questions import get_menu
-from requests import make_post_request
+from requests import make_post_request, make_get_request
 from storage import UserStorage, ApplicationStorage
 from utils import send_message
 from validators import validate_date
 from constants import (
-    MESSAGES, ENDPONT_CREATE_USER, SERVICE_CHAT_ID, ENDPONT_CREATE_APPLICATION, MESSAGES_TO_MANAGER
+    MESSAGES, ENDPONT_CREATE_USER, SERVICE_CHAT_ID, ENDPONT_CREATE_APPLICATION, MESSAGES_TO_MANAGER, ENDPONT_GET_APPLICATION_LIST,
 )
 
 
@@ -169,7 +169,7 @@ async def get_target_date(message: types.Message, state: FSMContext):
         response = await make_post_request(
             ENDPONT_CREATE_APPLICATION, application_dict
         )
-        if response.status_code != 200:
+        if response.status_code != 201:
             logging.info(f"Заявка не создана БД: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Заявка не создана БД")
         logging.info("Заявка создана в БД")
@@ -210,10 +210,18 @@ async def invalid_values_target_date(
 @router.message(F.text.lower() == "мои заявки")
 async def answer_no(message: Message):
     """Обрабатывает клик по кнопке."""
-    await message.answer("Жаль")
+    tg_id = message.from_user.id
+    response = await make_get_request(ENDPONT_GET_APPLICATION_LIST, tg_id)
+    print(response.status_code)
+    print(response.text)
+    await message.answer("Ваши заявки: " + response.text)
+    logging.info("Пользователь запросил заявки")
 
 
 @router.message(F.text.lower() == "мои юр. лица")
 async def answer_no1(message: Message):
     """Обрабатывает клик по кнопке."""
-    await message.answer("Чтото")
+    tg_id = message.from_user.id
+    response = await make_get_request(ENDPONT_GET_APPLICATION_LIST, tg_id)
+    await message.answer("Ваши юр. лица: " + response.text) # TODO Получить по api название компании
+    logging.info("Пользователь запросил юр. лица")
