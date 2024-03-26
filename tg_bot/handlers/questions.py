@@ -44,7 +44,7 @@ async def cmd_start(message: Message, state: FSMContext):
 
     try:
         response = await make_post_request(ENDPONT_CREATE_USER, user_dict)
-        if response.status_code != 200:
+        if response.status_code != 201:
             logging.info(f"Пользователь не создан: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Пользователь не создан")
         logging.info("Пользователь создан")

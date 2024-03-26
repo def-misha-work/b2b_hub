@@ -8,7 +8,7 @@
 
     def to_dict(self):
         return {
-            'tg_id': self.tg_id,
+            'tg_user_id': self.tg_id,
             'tg_username': self.tg_username,
             'tg_name': self.tg_name,
             'tg_surname': self.tg_surname
@@ -48,7 +48,7 @@ class ApplicationStorage():
 
     def to_dict(self):
         return {
-            'tg_id': self.tg_id,
+            'tg_user_id': self.tg_id,
             'inn_payer': self.inn_payer,
             'inn_recipient': self.inn_recipient,
             'application_cost': self.application_cost,
