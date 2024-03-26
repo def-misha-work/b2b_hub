@@ -3,8 +3,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, Extra, Field
 
-from backend.constants import CREATE_DATE
-
 
 class CompanyBase(BaseModel):
     """Базовая схема компании."""
@@ -16,6 +14,7 @@ class CompanyBase(BaseModel):
         ...,
         description="ИНН компании",
     )
+    tg_user_id: int
 
     class Config:
         extra = Extra.forbid
@@ -36,7 +35,6 @@ class CompanyDB(CompanyCreate):
     id: int
     company_add_date: datetime = Field(
         ...,
-        example=CREATE_DATE,
         description="Дата добавления компании",
     )
 

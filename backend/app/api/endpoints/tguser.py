@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.db import get_async_session
@@ -13,14 +14,18 @@ router = APIRouter()
     CLEAR_ROUTE,
     response_model=TgUserDB,
     response_model_exclude_none=True,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_new_tguser(
     tguser_data: TgUserCreate,
     session: AsyncSession = Depends(get_async_session),
 ):
-    """Создать нового telegram-пользователя."""
-    if not await tguser_crud.check_if_tguser_exists(tguser_data.tg_id, session):
+    """Проверить наличие и создать нового telegram-пользователя."""
+    if not await tguser_crud.check_if_tguser_exists(tguser_data.tg_user_id, session):
         new_user = await tguser_crud.create(tguser_data, session)
         return new_user
     else:
-        return tguser_data
+        return JSONResponse(
+            content={"message": f"User {tguser_data.tg_user_id} already exists"},
+            status_code=status.HTTP_200_OK
+        )

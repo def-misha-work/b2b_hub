@@ -1,16 +1,16 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List
 
 from pydantic import BaseModel, Extra, Field, validator
 
-from backend.constants import CREATE_DATE, EMPTY_FIELD_ERROR
+from backend.constants import EMPTY_FIELD_ERROR
 
 
 class ApplicationBase(BaseModel):
     """Базовая схема заявки."""
-    target_date: datetime = Field(
+    target_date: str = Field(
         ...,
-        example=CREATE_DATE,
+        example=(datetime.now() + timedelta(days=1)).strftime("%d.%m.%Y"),
         description="Ожидаемая дата выполнения заявки",
     )
     cost: float = Field(
@@ -32,6 +32,7 @@ class ApplicationCreate(ApplicationBase):
         ...,
         description="Список ИНН получателей",
     )
+    tg_user_id: int
 
 
 class ApplicationUpdate(ApplicationCreate):
@@ -44,17 +45,12 @@ class ApplicationUpdate(ApplicationCreate):
         return value
 
 
-class ApplicationDB(ApplicationCreate):
-    """Схема заявки в БД."""
-    id: int
-    create_date: datetime = Field(
-        ...,
-        example=CREATE_DATE,
-        description="Дата создания заявки",
-    )
-
-    class Config:
-        orm_mode = True
+# class ApplicationDB(ApplicationCreate):
+#     """Схема заявки в БД."""
+#     id: int
+#
+#     class Config:
+#         orm_mode = True
 
 
 class ApplicationResponse(ApplicationCreate):

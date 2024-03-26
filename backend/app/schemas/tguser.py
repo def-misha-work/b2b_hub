@@ -9,7 +9,7 @@ class TgUserBase(BaseModel):
         ...,
         description="Username telegram-пользователя",
     )
-    tg_id: int = Field(
+    tg_user_id: int = Field(
         ...,
         primary_key=True,
         description="id telegram-пользователя",

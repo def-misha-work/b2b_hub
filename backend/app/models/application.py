@@ -1,7 +1,7 @@
-from sqlalchemy import Column, DateTime, Float
+from sqlalchemy import Column, DateTime, Float, ForeignKey, BigInteger, String
 
 from backend.constants import (
-    CREATE_DATE_DEFAULT,
+    CREATE_DATE_DEFAULT, TG_USER_FOREIGN_KEY,
 )
 from backend.app.core.db import Base
 
@@ -11,11 +11,11 @@ class Application(Base):
     # Дата создания заявки
     create_date = Column(
         DateTime,
-        default=CREATE_DATE_DEFAULT,
+        default=lambda: CREATE_DATE_DEFAULT,
     )
-    # Ожидаемая дата выполнения заявки
+    # Ожидаемая дата выполнения заявки, например 27.03.2024
     target_date = Column(
-        DateTime,
+        String,
         nullable=False,
     )
     # Сумма заявки
@@ -23,4 +23,5 @@ class Application(Base):
         Float,
         nullable=False,
     )
-    # user_id = Column(Integer, ForeignKey('user.id'))
+    # Ссылка на пользователя
+    tg_user_id = Column(BigInteger, ForeignKey(TG_USER_FOREIGN_KEY))

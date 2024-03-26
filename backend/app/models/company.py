@@ -1,7 +1,7 @@
-from sqlalchemy import Column, DateTime, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, BigInteger, String
 
 from backend.constants import (
-    CREATE_DATE_DEFAULT, COMPANY_NAME_MAX_LEN,
+    CREATE_DATE_DEFAULT, COMPANY_NAME_MAX_LEN, TG_USER_FOREIGN_KEY,
 )
 from backend.app.core.db import Base
 
@@ -13,6 +13,6 @@ class Company(Base):
         unique=False,  # а вот уникальное ли?
         nullable=True,  # подтянем при развитии проекта
     )
-    company_inn = Column(Integer, unique=True)
+    company_inn = Column(BigInteger, unique=True)
     company_add_date = Column(DateTime, default=CREATE_DATE_DEFAULT)
-    # user_id = Column(Integer, ForeignKey('user.id'))
+    tg_user_id = Column(BigInteger, ForeignKey(TG_USER_FOREIGN_KEY))

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, BigInteger, String
 
 from backend.constants import (
     TG_USERNAME_MAX_LEN,
@@ -8,13 +8,11 @@ from backend.app.core.db import Base
 
 class TgUser(Base):
     """Модель телеграм-пользователя."""
-    tg_id: int = Column(
-        Integer,
-    )
+    tg_user_id: int = Column(BigInteger, unique=True)
     tg_username = Column(
         String(TG_USERNAME_MAX_LEN),
         unique=True,
         nullable=False,
     )
-    name = Column(String(TG_USERNAME_MAX_LEN))
-    lastname = Column(String(TG_USERNAME_MAX_LEN))
+    name = Column(String(TG_USERNAME_MAX_LEN), nullable=True)
+    lastname = Column(String(TG_USERNAME_MAX_LEN), nullable=True)

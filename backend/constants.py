@@ -5,7 +5,7 @@ APP_TITLE = 'Приложение B2B Hub'
 ENV_FILE_NAME = '.env'
 
 # models
-CREATE_DATE_DEFAULT = datetime.utcnow
+CREATE_DATE_DEFAULT = datetime.now().replace(microsecond=0)
 
 COMPANY_NAME_MAX_LEN = 100
 STATUS_MAX_LEN = 15
@@ -14,6 +14,7 @@ TG_USERNAME_MAX_LEN = 100
 APPLICATION_FOREIGN_KEY = 'application.id'
 COMPANY_INN_FOREIGN_KEY = 'company.company_inn'
 COMPANY_ID_FOREIGN_KEY = 'company.id'
+TG_USER_FOREIGN_KEY = 'tguser.tg_user_id'
 
 # api/routers
 APPLICATION_ROUTER_PREFIX = '/application'
@@ -26,8 +27,4 @@ TGUSER_ROUTER_TAG = 'Telegram users'
 CLEAR_ROUTE = '/'
 
 # schemas/wish
-CREATE_DATE = datetime.now().isoformat(timespec='seconds')
 EMPTY_FIELD_ERROR = 'Поле {} не может быть пустым!'
-
-# crud application
-CREATE_DATE_APPLICATION = datetime.utcnow()
