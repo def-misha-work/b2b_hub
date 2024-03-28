@@ -10,8 +10,8 @@
         return {
             'tg_user_id': self.tg_id,
             'tg_username': self.tg_username,
-            'tg_name': self.tg_name,
-            'tg_surname': self.tg_surname
+            'name': self.tg_name,
+            'lastname': self.tg_surname
         }
 
 
@@ -53,10 +53,9 @@ class ApplicationStorage():
 
     def to_dict(self):
         return {
-            'tg_user_id': self.tg_id,
+            'target_date': self.target_date,
+            'cost': self.application_cost,
             'inn_payer': self.inn_payer,
             'inn_recipient': self.inn_recipient,
-            'application_cost': self.application_cost,
-            'target_date': self.target_date,
-            # 'application_id': self.application_id
+            'tg_user_id': self.tg_id,
         }

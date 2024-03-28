@@ -36,7 +36,7 @@ async def cmd_start(message: Message, state: FSMContext):
     logging.info("Пользователь запустил бота")
     await state.set_state(None)
 
-    tg_id = message.from_user.id
+    tg_id = str(message.from_user.id)
     tg_username = message.from_user.username
     tg_name = message.from_user.first_name
     tg_surname = message.from_user.last_name
@@ -45,10 +45,14 @@ async def cmd_start(message: Message, state: FSMContext):
 
     try:
         response = await make_post_request(ENDPONT_CREATE_USER, user_dict)
-        if response.status_code != 201:
+        if response.status_code == 200:
+            logging.info(f"Пользователь уже есть: {response.status_code}")
+        elif response.status_code == 201:
+            logging.info("Пользователь создан")
+            await send_message(SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}")
+        else:
             logging.info(f"Пользователь не создан: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Пользователь не создан")
-        logging.info("Пользователь создан")
         # await send_message(SERVICE_CHAT_ID, "Пользователь создан") TODO Раскомментировать на бой. # noqa
         # await send_message(SERVICE_CHAT_ID, "Пользователь создан") TODO Сделать отправку Боре. # noqa
     except Exception as e:
@@ -77,7 +81,7 @@ async def application_step_one(message: Message, state: FSMContext):
 )
 async def get_inn_payer(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 10 символов."""
-    inn_payer = message.text
+    inn_payer = [int(message.text)]
     application_storage.update_inn_payer(inn_payer)
     await message.answer(f"Вы ввели ИНН плательщика: {inn_payer}")
     await message.answer(MESSAGES["step2"])
@@ -101,7 +105,7 @@ async def invalid_values_inn_payer(message: types.Message, state: FSMContext):
 )
 async def get_inn_recipient(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 12 символов."""
-    inn_recipient = message.text
+    inn_recipient = [int(message.text)]
     application_storage.update_inn_recipient(inn_recipient)
     await message.answer(f"Вы ввели ИНН получателя: {inn_recipient}")
     await message.answer(MESSAGES["step3"])
@@ -128,7 +132,7 @@ async def invalid_values_inn_recipient(
 )
 async def get_application_cost(message: types.Message, state: FSMContext):
     """Обработка сообщения с суммой заявки."""
-    application_cost = message.text
+    application_cost = int(message.text)
     application_storage.update_application_cost(application_cost)
     await message.answer(f"Вы ввели сумму заявки: {application_cost}")
     await message.answer(MESSAGES["step4"])
@@ -175,7 +179,7 @@ async def get_target_date(message: types.Message, state: FSMContext):
             )
         data = json.loads(response.text)
         # logging.info(f"Это ответ POST: {data}")
-        application_id = data["application_id"]
+        application_id = data["id"]
         logging.info("Заявка создана в БД")
     except Exception as e:
         logging.info(f"Ошибка при создании заявки: {e}")
@@ -187,8 +191,8 @@ async def get_target_date(message: types.Message, state: FSMContext):
         application_storage.update_application_id(application_id)
         application_info = MESSAGES["application"].format(
             application_storage.application_id,
-            application_storage.inn_payer,
-            application_storage.inn_recipient,
+            *application_storage.inn_payer,
+            *application_storage.inn_recipient,
             application_storage.application_cost,
             application_storage.target_date
         )
@@ -225,11 +229,12 @@ async def invalid_values_target_date(
 async def get_application_list(message: Message):
     """Обрабатывает клик по кнопке Список заявок."""
     logging.info("Пользователь запросил заявки")
-    tg_id = message.from_user.id
+    tg_id = str(message.from_user.id)
+    logging.info(f"Это tg_id {tg_id}, {type(tg_id)})")
     application_list = False
     try:
         response = await make_get_request(ENDPONT_GET_APPLICATION_LIST, tg_id)
-        if response.status_code != 201:
+        if response.status_code != 200:
             logging.info(
                 f"Список заявок не получен ответ: {response.status_code}"
             )
@@ -238,7 +243,7 @@ async def get_application_list(message: Message):
                 f"Список заявок не получен ответ: {response.status_code}"
             )
         application_list = json.loads(response.text)
-        logging.info("Ответ от БД получен")
+        logging.info(f"Ответ от БД получен {application_list}")
     except Exception as e:
         logging.info(f"Ошибка при получение спика заявок: {e}")
         await send_message(
