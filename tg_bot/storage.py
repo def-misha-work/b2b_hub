@@ -23,13 +23,15 @@ class ApplicationStorage():
         inn_payer=None,
         inn_recipient=None,
         application_cost=None,
-        target_date=None
+        target_date=None,
+        application_id=None
     ):
         self.tg_id = tg_id
         self.inn_payer = inn_payer
         self.inn_recipient = inn_recipient
         self.application_cost = application_cost
         self.target_date = target_date
+        self.application_id = application_id
 
     def update_tg_id(self, new_tg_id):
         self.tg_id = new_tg_id
@@ -46,11 +48,15 @@ class ApplicationStorage():
     def update_target_date(self, new_target_date):
         self.target_date = new_target_date
 
+    def update_application_id(self, new_application_id):
+        self.application_id = new_application_id
+
     def to_dict(self):
         return {
             'tg_user_id': self.tg_id,
             'inn_payer': self.inn_payer,
             'inn_recipient': self.inn_recipient,
             'application_cost': self.application_cost,
-            'target_date': self.target_date
+            'target_date': self.target_date,
+            # 'application_id': self.application_id
         }
