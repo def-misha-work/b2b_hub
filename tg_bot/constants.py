@@ -9,9 +9,9 @@ SERVICE_TELEGRAM_TOKEN = os.getenv("SERVICE_TELEGRAM_TOKEN")
 SERVICE_CHAT_ID = os.getenv("SERVICE_CHAT_ID")
 MANAGER_CHAT_ID = os.getenv("MANAGER_CHAT_ID")
 
-ENDPONT_CREATE_USER = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
-ENDPONT_CREATE_APPLICATION = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
-ENDPONT_GET_APPLICATION_LIST = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
+ENDPONT_CREATE_USER = "http://192.168.0.20:8001/tguser" # noqa
+ENDPONT_CREATE_APPLICATION = "http://192.168.0.20:8001/application" # noqa
+ENDPONT_GET_APPLICATION_LIST = "http://192.168.0.20:8001/application_id/my/" # noqa
 # ENDPONT_CREATE_USER = "https://ya.ru/"
 
 MESSAGES = {
