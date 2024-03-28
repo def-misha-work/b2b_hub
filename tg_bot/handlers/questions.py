@@ -281,3 +281,5 @@ async def answer_no1(message: Message):
     logging.info(response)
     await message.answer("Пока не работает, но тут будет список юр. лиц") # TODO Получить по api название компании
     logging.info("Пользователь запросил юр. лица")
+    await message.answer(MESSAGES["menu"], reply_markup=get_menu())
+    logging.info("Пользователь в меню")
