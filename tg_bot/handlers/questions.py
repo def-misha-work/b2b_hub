@@ -156,12 +156,6 @@ async def get_target_date(message: types.Message, state: FSMContext):
     """Обработка сообщения с датой в формате 20.10.25."""
     target_date = message.text
     application_storage.update_target_date(target_date)
-    application_info = MESSAGES["application"].format(
-        application_storage.inn_payer,
-        application_storage.inn_recipient,
-        application_storage.application_cost,
-        application_storage.target_date
-    )
     logging.info("Успех шаг 4")
 
     application_dict = application_storage.to_dict()
@@ -172,8 +166,22 @@ async def get_target_date(message: types.Message, state: FSMContext):
         if response.status_code != 201:
             logging.info(f"Заявка не создана БД: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Заявка не создана БД")
+        # logging.info(f"Это ответ на POST: {response.text}")
         logging.info("Заявка создана в БД")
-        # Отправляем в саппорт
+    except Exception as e:
+        logging.info(f"Ошибка при создании заявки: {e}")
+        await send_message(SERVICE_CHAT_ID, "Ошибка создания заявки")
+    
+    # Отправляем в саппорт
+        application_id = response.text["application_id"]
+        application_storage.application_id(application_id)
+        application_info = MESSAGES["application"].format(
+            application_storage.application_id,
+            application_storage.inn_payer,
+            application_storage.inn_recipient,
+            application_storage.application_cost,
+            application_storage.target_date
+        )
         application_to_manager = MESSAGES_TO_MANAGER["application_created"].format(
             message.from_user.first_name,
             message.from_user.username,
@@ -184,10 +192,6 @@ async def get_target_date(message: types.Message, state: FSMContext):
         # Отправляем менеджеру
         # await send_message(MANAGER_CHAT_ID, application_to_manager) TODO Расскоментить на бою. # noqa
         # logging.info("Заявка отправлена менеджеру")
-    except Exception as e:
-        logging.info(f"Ошибка при создании заявки: {e}")
-        await send_message(SERVICE_CHAT_ID, "Ошибка создания заявки")
-
     await message.answer("Ваша заявка:" + application_info)
     await message.answer(MESSAGES["application_created"])
     await state.set_state(None)
