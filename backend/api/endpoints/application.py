@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from copy import deepcopy
 
-from backend.app.api.validators import check_application_exists
-from backend.app.core.db import get_async_session
-from backend.app.crud import application_crud, application_company_crud
-from backend.constants import CLEAR_ROUTE
-from backend.app.services.application_process import add_field_to_combined_table
-from backend.app.schemas.application import ApplicationCreate, ApplicationResponse
+from api.validators import check_application_exists
+from core.db import get_async_session
+from crud import application_crud, application_company_crud
+from constants import CLEAR_ROUTE
+from services.application_process import add_field_to_combined_table
+from schemas.application import ApplicationCreate, ApplicationResponse
 
 
 router = APIRouter()
@@ -82,7 +82,6 @@ async def create_new_application(
 @router.delete(
     '/{application_id}',
     response_model=ApplicationResponse,
-    # response_model_exclude_none=True,
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def remove_application(

@@ -1,9 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 
-from backend.app.crud import application_crud, application_company_crud
-from backend.app.models import Application, ApplicationCompany
+from crud import application_crud
+from models import Application
 
 
 async def check_application_exists(

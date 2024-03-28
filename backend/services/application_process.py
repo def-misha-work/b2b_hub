@@ -1,7 +1,8 @@
 from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.app.crud import company_crud
-from backend.app.models import ApplicationCompany, Company
+
+from crud import company_crud
+from models import ApplicationCompany, Company
 
 
 async def create_or_check_company(company_inn: int, tg_user_id: int, session: AsyncSession):

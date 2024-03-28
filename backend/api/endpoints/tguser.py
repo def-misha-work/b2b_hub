@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.core.db import get_async_session
-from backend.app.crud import tguser_crud
-from backend.app.schemas.tguser import TgUserCreate, TgUserDB
-from backend.constants import CLEAR_ROUTE
+from core.db import get_async_session
+from crud import tguser_crud
+from schemas.tguser import TgUserCreate, TgUserDB
+from constants import CLEAR_ROUTE
 
 router = APIRouter()
 

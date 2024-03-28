@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.crud.base import CRUDBase
-from backend.app.models.tguser import TgUser
+from crud.base import CRUDBase
+from models.tguser import TgUser
 
 
 class CRUDTgUser(CRUDBase):

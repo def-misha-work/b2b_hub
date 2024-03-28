@@ -1,8 +1,8 @@
 from typing import List
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from backend.app.crud.base import CRUDBase
-from backend.app.models import ApplicationCompany
+from crud.base import CRUDBase
+from models import ApplicationCompany
 
 
 class CRUDApplicationCompany(CRUDBase):

@@ -1,8 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.app.crud.base import CRUDBase
-from backend.app.models.company import Company
+from crud.base import CRUDBase
+from models.company import Company
 
 
 class CRUDCompany(CRUDBase):

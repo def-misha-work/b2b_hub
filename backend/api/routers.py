@@ -1,10 +1,10 @@
 from fastapi import APIRouter
 
-from backend.constants import (
+from constants import (
     APPLICATION_ROUTER_PREFIX, APPLICATION_ROUTER_TAG,
     TGUSER_ROUTER_PREFIX, TGUSER_ROUTER_TAG,
 )
-from backend.app.api.endpoints import (
+from api.endpoints import (
     application_router, tguser_router,
 )
 

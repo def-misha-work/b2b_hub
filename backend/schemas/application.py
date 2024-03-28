@@ -3,7 +3,7 @@ from typing import List
 
 from pydantic import BaseModel, Extra, Field, validator
 
-from backend.constants import EMPTY_FIELD_ERROR
+from constants import EMPTY_FIELD_ERROR
 
 
 class ApplicationBase(BaseModel):

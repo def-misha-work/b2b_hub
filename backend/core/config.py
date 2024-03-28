@@ -1,6 +1,6 @@
 from pydantic import BaseSettings
 
-from backend.constants import (
+from constants import (
     APP_TITLE, ENV_FILE_NAME,
 )
 

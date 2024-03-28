@@ -1,9 +1,9 @@
 from sqlalchemy import Column, DateTime, Float, ForeignKey, BigInteger, String
 
-from backend.constants import (
+from constants import (
     CREATE_DATE_DEFAULT, TG_USER_FOREIGN_KEY,
 )
-from backend.app.core.db import Base
+from core.db import Base
 
 
 class Application(Base):

@@ -1,9 +1,9 @@
 from sqlalchemy import Column, BigInteger, String
 
-from backend.constants import (
+from constants import (
     TG_USERNAME_MAX_LEN,
 )
-from backend.app.core.db import Base
+from core.db import Base
 
 
 class TgUser(Base):

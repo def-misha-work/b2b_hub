@@ -1,9 +1,9 @@
 from sqlalchemy import Column, ForeignKey, BigInteger, String
 
-from backend.constants import (
+from constants import (
     APPLICATION_FOREIGN_KEY, COMPANY_INN_FOREIGN_KEY, STATUS_MAX_LEN,
 )
-from backend.app.core.db import Base
+from core.db import Base
 
 
 class ApplicationCompany(Base):

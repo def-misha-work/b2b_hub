@@ -1,9 +1,9 @@
 from sqlalchemy import Column, DateTime, ForeignKey, BigInteger, String
 
-from backend.constants import (
+from constants import (
     CREATE_DATE_DEFAULT, COMPANY_NAME_MAX_LEN, TG_USER_FOREIGN_KEY,
 )
-from backend.app.core.db import Base
+from core.db import Base
 
 
 class Company(Base):

@@ -2,10 +2,9 @@ from typing import Optional, List
 from sqlalchemy import select
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
-from backend.app.crud.base import CRUDBase
-from backend.app.models import Application, ApplicationCompany
+from crud.base import CRUDBase
+from models import Application
 
 
 class CRUDApplication(CRUDBase):
