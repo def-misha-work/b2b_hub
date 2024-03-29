@@ -14,7 +14,7 @@ from storage import UserStorage, ApplicationStorage
 from utils import send_message
 from validators import validate_date
 from constants import (
-    MESSAGES, TECH_MESSAGES, ENDPONT_CREATE_USER, SERVICE_CHAT_ID, ENDPONT_CREATE_APPLICATION, MESSAGES_TO_MANAGER, ENDPONT_GET_APPLICATION_LIST,
+    MESSAGES, MANAGER_CHAT_ID, TECH_MESSAGES, ENDPONT_CREATE_USER, SERVICE_CHAT_ID, ENDPONT_CREATE_APPLICATION, MESSAGES_TO_MANAGER, ENDPONT_GET_APPLICATION_LIST,
 )
 
 
@@ -50,11 +50,10 @@ async def cmd_start(message: Message, state: FSMContext):
         elif response.status_code == 201:
             logging.info("Пользователь создан")
             await send_message(SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}")
+            await send_message(MANAGER_CHAT_ID, f"Новый пользователь @{tg_username}")
         else:
             logging.info(f"Пользователь не создан: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Пользователь не создан")
-        # await send_message(SERVICE_CHAT_ID, "Пользователь создан") TODO Раскомментировать на бой. # noqa
-        # await send_message(SERVICE_CHAT_ID, "Пользователь создан") TODO Сделать отправку Боре. # noqa
     except Exception as e:
         logging.info(f"Ошибка при создании пользователя: {e}")
         await send_message(SERVICE_CHAT_ID, "Ошибка создания пользователя")
@@ -203,10 +202,8 @@ async def get_target_date(message: types.Message, state: FSMContext):
             application_info
         )
         await send_message(SERVICE_CHAT_ID, application_to_manager)
+        await send_message(MANAGER_CHAT_ID, application_to_manager)
         logging.info("Заявка отправлена в саппорт")
-        # Отправляем менеджеру
-        # await send_message(MANAGER_CHAT_ID, application_to_manager) TODO Расскоментить на бою. # noqa
-        # logging.info("Заявка отправлена менеджеру")
         await message.answer("Ваша заявка:" + application_info)
         await message.answer(MESSAGES["application_created"])
         await state.set_state(None)
