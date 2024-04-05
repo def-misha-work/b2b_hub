@@ -23,6 +23,8 @@ APPLICATION_ROUTER_TAG = 'Applications'
 TGUSER_ROUTER_PREFIX = '/tguser'
 TGUSER_ROUTER_TAG = 'Telegram users'
 
+# USER_ROUTER_TAG = 'General users'
+
 # api/endpoints/application
 CLEAR_ROUTE = '/'
 
