@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from constants import (
     APPLICATION_ROUTER_PREFIX, APPLICATION_ROUTER_TAG,
-    TGUSER_ROUTER_PREFIX, TGUSER_ROUTER_TAG, # USER_ROUTER_TAG,
+    TGUSER_ROUTER_PREFIX, TGUSER_ROUTER_TAG,
 )
 from api.endpoints import (
     application_router, tguser_router, user_router,
@@ -22,6 +22,4 @@ main_router.include_router(
     tags=[TGUSER_ROUTER_TAG],
 )
 
-main_router.include_router(
-    user_router,
-)
+main_router.include_router(user_router)

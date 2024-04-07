@@ -63,7 +63,6 @@ async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
 
 
-# Объект библиотеки, связывающий объект класса UserManager и бэкенд аутентификации
 fastapi_users = FastAPIUsers[User, int](
     get_user_manager,
     [auth_backend],

@@ -3,9 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from copy import deepcopy
 
 from api.validators import check_application_exists
-from core.db import get_async_session
-from crud import application_crud, application_company_crud
 from constants import CLEAR_ROUTE
+from core.db import get_async_session
+from core.user import current_superuser, current_user
+from crud import application_crud, application_company_crud
 from services.application_process import add_field_to_combined_table
 from schemas.application import ApplicationCreate, ApplicationResponse
 
@@ -16,6 +17,7 @@ router = APIRouter()
 @router.get(
     '/{application_id}',
     response_model=ApplicationResponse,
+    dependencies=[Depends(current_user)],
 )
 async def get_application_by_id(
     application_id: int,
@@ -42,6 +44,7 @@ async def get_application_by_id(
 @router.get(
     '/my/{tg_user_id}',
     response_model=list[ApplicationResponse],
+    dependencies=[Depends(current_user)],
 )
 async def get_all_applications_by_tg_user(
     tg_user_id: int,
@@ -60,6 +63,7 @@ async def get_all_applications_by_tg_user(
     CLEAR_ROUTE,
     response_model=ApplicationResponse,
     status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(current_user)],
 )
 async def create_new_application(
     application_data: ApplicationCreate,
@@ -83,6 +87,7 @@ async def create_new_application(
     '/{application_id}',
     response_model=ApplicationResponse,
     status_code=status.HTTP_202_ACCEPTED,
+    dependencies=[Depends(current_superuser)],
 )
 async def remove_application(
         application_id: int,
