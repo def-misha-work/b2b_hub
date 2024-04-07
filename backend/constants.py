@@ -20,6 +20,9 @@ TG_USER_FOREIGN_KEY = 'tguser.tg_user_id'
 APPLICATION_ROUTER_PREFIX = '/application'
 APPLICATION_ROUTER_TAG = 'Applications'
 
+COMPANY_ROUTER_PREFIX = '/company'
+COMPANY_ROUTER_TAG = 'Companies'
+
 TGUSER_ROUTER_PREFIX = '/tguser'
 TGUSER_ROUTER_TAG = 'Telegram users'
 
