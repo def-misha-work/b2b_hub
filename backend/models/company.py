@@ -10,8 +10,8 @@ class Company(Base):
     """Модель для компаний (плательщиков и получателей)."""
     company_name = Column(
         String(COMPANY_NAME_MAX_LEN),
-        unique=False,  # а вот уникальное ли?
-        nullable=True,  # подтянем при развитии проекта
+        unique=False,
+        nullable=True,
     )
     company_inn = Column(BigInteger, unique=True)
     company_add_date = Column(DateTime, default=CREATE_DATE_DEFAULT)

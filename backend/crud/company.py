@@ -1,3 +1,4 @@
+from typing import Optional, List
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,6 +37,19 @@ class CRUDCompany(CRUDBase):
         await session.commit()
         await session.refresh(db_obj)
         return db_obj
+
+    async def get_companies_by_tg_user_id(
+        self,
+        tg_user_id: int,
+        session: AsyncSession,
+    ) -> Optional[List[Company]]:
+        """Получить все компании по id telegram-пользователя."""
+        db_companies = await session.execute(
+            select(Company).where(
+                Company.tg_user_id == tg_user_id
+            )
+        )
+        return db_companies.scalars().all()
 
 
 company_crud = CRUDCompany(Company)

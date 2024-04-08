@@ -13,7 +13,6 @@ TG_USERNAME_MAX_LEN = 100
 
 APPLICATION_FOREIGN_KEY = 'application.id'
 COMPANY_INN_FOREIGN_KEY = 'company.company_inn'
-COMPANY_ID_FOREIGN_KEY = 'company.id'
 TG_USER_FOREIGN_KEY = 'tguser.tg_user_id'
 
 # api/routers
@@ -25,8 +24,6 @@ COMPANY_ROUTER_TAG = 'Companies'
 
 TGUSER_ROUTER_PREFIX = '/tguser'
 TGUSER_ROUTER_TAG = 'Telegram users'
-
-# USER_ROUTER_TAG = 'General users'
 
 # api/endpoints/application
 CLEAR_ROUTE = '/'

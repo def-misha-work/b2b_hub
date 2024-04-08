@@ -14,7 +14,6 @@ class CompanyBase(BaseModel):
         ...,
         description="ИНН компании",
     )
-    tg_user_id: int
 
     class Config:
         extra = Extra.forbid
@@ -22,10 +21,10 @@ class CompanyBase(BaseModel):
 
 class CompanyCreate(CompanyBase):
     """Схема для создания компании."""
-    ...
+    tg_user_id: int
 
 
-class CompanyUpdate(CompanyBase):
+class CompanyUpdate(CompanyCreate):
     """Схема для обновления полей компании."""
     ...
 

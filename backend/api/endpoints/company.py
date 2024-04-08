@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.db import get_async_session
 from core.user import current_user
 from crud import company_crud
-from schemas.company import CompanyUpdate
+from schemas.company import CompanyBase, CompanyUpdate
 
 
 router = APIRouter()
@@ -34,3 +34,22 @@ async def check_or_update_company_name(
             company_inn=company.company_inn,
             tg_user_id=company.tg_user_id,
         )
+
+
+@router.get(
+    '/my/{tg_user_id}',
+    response_model=list[CompanyBase],
+    dependencies=[Depends(current_user)],
+)
+async def get_all_companies_by_tg_user(
+    tg_user_id: int,
+    session: AsyncSession = Depends(get_async_session),
+) -> list[CompanyBase]:
+    """Получить список всех компаний telegram-пользователя."""
+    result = []
+    companies = await company_crud.get_companies_by_tg_user_id(tg_user_id, session)
+    for company in companies:
+        company = CompanyBase(company_name=company.company_name,
+                              company_inn=company.company_inn)
+        result.append(company)
+    return result

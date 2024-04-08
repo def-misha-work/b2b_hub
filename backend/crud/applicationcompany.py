@@ -10,9 +10,9 @@ class CRUDApplicationCompany(CRUDBase):
     ...
 
     async def get_objs_by_application_id(
-            self,
-            application_id: int,
-            session: AsyncSession,
+        self,
+        application_id: int,
+        session: AsyncSession,
     ) -> List[int]:
         query = await session.execute(
             select(ApplicationCompany).where(

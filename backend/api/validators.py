@@ -6,8 +6,8 @@ from models import Application
 
 
 async def check_application_exists(
-        application_id: int,
-        session: AsyncSession,
+    application_id: int,
+    session: AsyncSession,
 ) -> Application:
     """Проверить существование заявки по id."""
     application = await application_crud.get(application_id, session)
