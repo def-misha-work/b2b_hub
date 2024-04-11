@@ -162,7 +162,3 @@ cython_debug/
 
 
 b2b_hub.code-workspace
-/backend/alembic/README
-/backend/alembic/script.py.mako
-/backend/alembic.ini
-/backend/alembic/env.py
