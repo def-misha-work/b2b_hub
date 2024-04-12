@@ -9,10 +9,12 @@ SERVICE_TELEGRAM_TOKEN = os.getenv("SERVICE_TELEGRAM_TOKEN")
 SERVICE_CHAT_ID = os.getenv("SERVICE_CHAT_ID")
 MANAGER_CHAT_ID = os.getenv("MANAGER_CHAT_ID")
 
-ENDPONT_CREATE_USER = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
-ENDPONT_CREATE_APPLICATION = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
-ENDPONT_GET_APPLICATION_LIST = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
-# ENDPONT_CREATE_USER = "https://ya.ru/"
+# ENDPONT_CREATE_USER = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
+# ENDPONT_CREATE_APPLICATION = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
+# ENDPONT_GET_APPLICATION_LIST = "https://webhook.site/d08effda-18c1-4e76-be8e-990b27c72eca" # noqa
+ENDPONT_CREATE_USER = "http://backend:8000/tguser/"
+ENDPONT_CREATE_APPLICATION = "http://backend:8000/application/"
+ENDPONT_GET_APPLICATION_LIST = "http://backend:8000/application/my/"
 
 MESSAGES = {
     "start": "Добрый день, {}!\nСервис B2Bhub приветствует Вас!",
