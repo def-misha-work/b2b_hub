@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.db import get_async_session
-from core.user import current_user
+from core.user import get_current_username
 from crud import tguser_crud
 from schemas.tguser import TgUserCreate, TgUserDB
 from constants import CLEAR_ROUTE
@@ -16,7 +16,7 @@ router = APIRouter()
     response_model=TgUserDB,
     response_model_exclude_none=True,
     status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(current_user)],
+    dependencies=[Depends(get_current_username)],
 )
 async def create_new_tguser(
     tguser_data: TgUserCreate,

@@ -1,31 +1,22 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
-from core.user import auth_backend, fastapi_users
-from schemas.user import UserCreate, UserRead, UserUpdate
+from core.user import get_current_username
+from schemas.user import UserBase
 
 router = APIRouter()
 
-router.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix='/auth/jwt',
-    tags=['auth'],
-)
-router.include_router(
-    fastapi_users.get_register_router(UserRead, UserCreate),
-    prefix='/auth',
-    tags=['auth'],
-)
-router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix='/users',
-    tags=['users'],
-)
+
+@router.get("/me")
+def read_current_user(
+        user_data: UserBase = Depends(get_current_username)
+):
+    return {"username": user_data.username}
 
 
 @router.delete(
-    '/users/{id}',
+    '/{id}',
     tags=['users'],
-    deprecated=True
+    deprecated=True,
 )
 def delete_user(id: str):
     """Не используйте удаление, деактивируйте пользователей."""

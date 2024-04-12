@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.db import get_async_session
-from core.user import current_user
+from core.user import get_current_username
 from crud import company_crud
 from schemas.company import CompanyBase, CompanyUpdate
 
@@ -13,7 +13,7 @@ router = APIRouter()
 @router.patch(
     '/{company_id}/update',
     response_model=CompanyUpdate,
-    dependencies=[Depends(current_user)],
+    dependencies=[Depends(get_current_username)],
 )
 async def check_or_update_company_name(
     company_inn: int,
@@ -39,7 +39,7 @@ async def check_or_update_company_name(
 @router.get(
     '/my/{tg_user_id}',
     response_model=list[CompanyBase],
-    dependencies=[Depends(current_user)],
+    dependencies=[Depends(get_current_username)],
 )
 async def get_all_companies_by_tg_user(
     tg_user_id: int,

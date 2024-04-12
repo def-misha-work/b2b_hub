@@ -4,7 +4,7 @@ from pydantic import BaseModel, Extra, Field
 
 
 class TgUserBase(BaseModel):
-    """Базовая схема телеграм-пользователя."""
+    """Базовая схема telegram-пользователя."""
     tg_username: str = Field(
         ...,
         description="Username telegram-пользователя",
@@ -28,17 +28,17 @@ class TgUserBase(BaseModel):
 
 
 class TgUserCreate(TgUserBase):
-    """Схема для создания компании."""
+    """Схема для создания telegram-пользователя."""
     ...
 
 
 class TgUserUpdate(TgUserBase):
-    """Схема для обновления полей компании."""
+    """Схема для обновления полей telegram-пользователя."""
     ...
 
 
 class TgUserDB(TgUserCreate):
-    """Схема компании в БД."""
+    """Схема telegram-пользователя в БД."""
     ...
 
     class Config:

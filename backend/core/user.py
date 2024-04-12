@@ -1,72 +1,27 @@
-from typing import Optional, Union
+import os
+from dotenv import load_dotenv
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
-from fastapi import Depends, Request
-from fastapi_users import (
-    BaseUserManager, FastAPIUsers, IntegerIDMixin, InvalidPasswordException
-)
-from fastapi_users.authentication import (
-    AuthenticationBackend, BearerTransport, JWTStrategy
-)
-from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
-from sqlalchemy.ext.asyncio import AsyncSession
+load_dotenv()
 
-from core.config import settings
-from core.db import get_async_session
-from models import User
-from schemas.user import UserCreate
+app = FastAPI()
 
+security = HTTPBasic()
 
-async def get_user_db(session: AsyncSession = Depends(get_async_session)):
-    yield SQLAlchemyUserDatabase(session, User)
+# Фиксированные пользователи с их паролями
+users = {
+    "basic_user": os.getenv('BASIC_USER_PASSWORD'),
+    "admin_user": os.getenv('ADMIN_USER_PASSWORD')
+}
 
 
-def get_jwt_strategy() -> JWTStrategy:
-    """Хранение токена в виде JWT."""
-    return JWTStrategy(secret=settings.secret, lifetime_seconds=43200)
-
-
-bearer_transport = BearerTransport(tokenUrl='auth/jwt/login')
-
-auth_backend = AuthenticationBackend(
-    name='jwt',
-    transport=bearer_transport,
-    get_strategy=get_jwt_strategy,
-)
-
-
-class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
-
-    async def validate_password(
-        self,
-        password: str,
-        user: Union[UserCreate, User],
-    ) -> None:
-        if len(password) < 10:
-            raise InvalidPasswordException(
-                reason='Password should be at least 3 characters'
-            )
-        if user.email in password:
-            raise InvalidPasswordException(
-                reason='Password should not contain e-mail'
-            )
-
-    async def on_after_register(
-        self,
-        user: User,
-        request: Optional[Request] = None,
-    ):
-        print(f'Пользователь {user.email} зарегистрирован.')
-
-
-async def get_user_manager(user_db=Depends(get_user_db)):
-    """Вернуть объект класса UserManager."""
-    yield UserManager(user_db)
-
-
-fastapi_users = FastAPIUsers[User, int](
-    get_user_manager,
-    [auth_backend],
-)
-
-current_user = fastapi_users.current_user(active=True)
-current_superuser = fastapi_users.current_user(active=True, superuser=True)
+def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+    password = users.get(credentials.username)
+    if not password or credentials.password != password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username

@@ -1,4 +1,6 @@
-﻿import logging
+﻿import os
+import aiohttp
+import logging
 import json
 
 from aiogram import Router, F, types
@@ -6,7 +8,8 @@ from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-
+from aiohttp import BasicAuth
+from dotenv import load_dotenv
 
 from keyboards.for_questions import get_menu
 from requests import make_post_request, make_get_request
@@ -18,6 +21,7 @@ from constants import (
 )
 
 
+load_dotenv()
 router = Router()
 application_storage = ApplicationStorage()
 
@@ -27,6 +31,15 @@ class NewApplication(StatesGroup):
     step_2 = State()
     step_3 = State()
     step_4 = State()
+
+
+# async def make_post_request_with_auth(url, username='basic_user', password=os.getenv('BASIC_USER_PASSWORD')):
+#     async with aiohttp.ClientSession() as session:
+#         async with session.post(url, auth=BasicAuth(username, password)) as response:
+#             if response.status == 200:
+#                 return await response.json()
+#             else:
+#                 return None
 
 
 @router.message(Command("start"))
@@ -44,6 +57,9 @@ async def cmd_start(message: Message, state: FSMContext):
     user_dict = user_storage.to_dict()
 
     try:
+        # response_test = await make_post_request_with_auth(ENDPONT_CREATE_USER)
+        # if response_test:
+        #     logging.info(f"НАСТЯ АФИГЕТЬ ЧТО-ТО ПОЛУЧИЛОСЬ: {response_test}")
         response = await make_post_request(ENDPONT_CREATE_USER, user_dict)
         if response.status_code == 200:
             logging.info(f"Пользователь уже есть: {response.status_code}")
@@ -166,6 +182,9 @@ async def get_target_date(message: types.Message, state: FSMContext):
     application_dict = application_storage.to_dict()
     application_id = False
     try:
+        # response_test = await make_post_request_with_auth(ENDPONT_CREATE_APPLICATION)
+        # if response_test:
+        #     logging.info(f"НАСТЯ АФИГЕТЬ ЧТО-ТО ПОЛУЧИЛОСЬ: {response_test}")
         response = await make_post_request(
             ENDPONT_CREATE_APPLICATION, application_dict
         )

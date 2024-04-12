@@ -25,6 +25,9 @@ COMPANY_ROUTER_TAG = 'Companies'
 TGUSER_ROUTER_PREFIX = '/tguser'
 TGUSER_ROUTER_TAG = 'Telegram users'
 
+USER_ROUTER_PREFIX = '/user'
+USER_ROUTER_TAG = 'Users'
+
 # api/endpoints/application
 CLEAR_ROUTE = '/'
 

@@ -1,13 +1,33 @@
-from fastapi_users import schemas
+from typing import Optional
+
+from pydantic import BaseModel, Extra, Field
 
 
-class UserRead(schemas.BaseUser[int]):
-    pass
+class UserBase(BaseModel):
+    """Базовая схема пользователя."""
+    username: str = Field(
+        ...,
+        description="Username пользователя",
+    )
+    password: str
+
+    class Config:
+        orm_mode = True
 
 
-class UserCreate(schemas.BaseUserCreate):
-    pass
+class UserUpdate(UserBase):
+    """Схема для обновления полей пользователя."""
+    ...
 
 
-class UserUpdate(schemas.BaseUserUpdate):
-    pass
+class UserDB(UserBase):
+    """Схема пользователя в БД."""
+    id: int = Field(
+        ...,
+        primary_key=True,
+        description="id пользователя",
+    )
+    is_superuser: bool = False
+
+    class Config:
+        orm_mode = True
