@@ -50,6 +50,7 @@ async def cmd_start(message: Message, state: FSMContext):
         elif response.status_code == 201:
             logging.info("Пользователь создан")
             await send_message(SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}")
+
             await send_message(MANAGER_CHAT_ID, f"Новый пользователь @{tg_username}")
         else:
             logging.info(f"Пользователь не создан: {response.status_code}")
@@ -67,6 +68,7 @@ async def cmd_start(message: Message, state: FSMContext):
 @router.message(StateFilter(None), F.text.lower() == "новая заявка")
 async def application_step_one(message: Message, state: FSMContext):
     """Обрабатывает клик по кнопке и запускает цепочку Новая заявка."""
+
     tg_username = message.from_user.username
     application_storage.update_tg_id(message.from_user.id)
     await message.answer(MESSAGES["step1"])

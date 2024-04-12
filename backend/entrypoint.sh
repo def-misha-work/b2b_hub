@@ -15,7 +15,6 @@ fi
 
 # alembic revision --autogenerate -m "Initianal migration"
 # alembic upgrade head
-
 uvicorn main:app --reload --host=0.0.0.0 --port=8000
 
 exec "$@"
