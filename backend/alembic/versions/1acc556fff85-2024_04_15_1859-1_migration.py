@@ -1,8 +1,8 @@
-"""Database creation
+"""1 migration
 
-Revision ID: 2d1b13ae4061
+Revision ID: 1acc556fff85
 Revises: 
-Create Date: 2024-04-08 21:27:43.856790
+Create Date: 2024-04-15 18:59:03.729322
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2d1b13ae4061'
+revision = '1acc556fff85'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -27,6 +27,15 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('tg_user_id'),
     sa.UniqueConstraint('tg_username')
+    )
+    op.create_table('user',
+    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('username', sa.String(), nullable=False),
+    sa.Column('is_superuser', sa.Boolean(), nullable=False),
+    sa.Column('password', sa.String(), nullable=False),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('id'),
+    sa.UniqueConstraint('username')
     )
     op.create_table('application',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -64,5 +73,6 @@ def downgrade():
     op.drop_table('applicationcompany')
     op.drop_table('company')
     op.drop_table('application')
+    op.drop_table('user')
     op.drop_table('tguser')
     # ### end Alembic commands ###
