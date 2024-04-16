@@ -1,6 +1,4 @@
-﻿import os
-import aiohttp
-import logging
+﻿import logging
 import json
 
 from aiogram import Router, F, types
@@ -8,7 +6,6 @@ from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-from aiohttp import BasicAuth
 from dotenv import load_dotenv
 
 from keyboards.for_questions import get_menu
@@ -17,7 +14,14 @@ from storage import UserStorage, ApplicationStorage
 from utils import send_message
 from validators import validate_date
 from constants import (
-    MESSAGES, TECH_MESSAGES, ENDPONT_CREATE_USER, SERVICE_CHAT_ID, ENDPONT_CREATE_APPLICATION, MESSAGES_TO_MANAGER, ENDPONT_GET_APPLICATION_LIST,
+    MESSAGES,
+    TECH_MESSAGES,
+    ENDPONT_CREATE_USER,
+    SERVICE_CHAT_ID,
+    ENDPONT_CREATE_APPLICATION,
+    MESSAGES_TO_MANAGER,
+    ENDPONT_GET_APPLICATION_LIST,
+    ENDPONT_GET_COMPANY_LIST,
 )
 
 
@@ -31,15 +35,6 @@ class NewApplication(StatesGroup):
     step_2 = State()
     step_3 = State()
     step_4 = State()
-
-
-# async def make_post_request_with_auth(url, username='basic_user', password=os.getenv('BASIC_USER_PASSWORD')):
-#     async with aiohttp.ClientSession() as session:
-#         async with session.post(url, auth=BasicAuth(username, password)) as response:
-#             if response.status == 200:
-#                 return await response.json()
-#             else:
-#                 return None
 
 
 @router.message(Command("start"))
@@ -57,15 +52,14 @@ async def cmd_start(message: Message, state: FSMContext):
     user_dict = user_storage.to_dict()
 
     try:
-        # response_test = await make_post_request_with_auth(ENDPONT_CREATE_USER)
-        # if response_test:
-        #     logging.info(f"НАСТЯ АФИГЕТЬ ЧТО-ТО ПОЛУЧИЛОСЬ: {response_test}")
         response = await make_post_request(ENDPONT_CREATE_USER, user_dict)
         if response.status_code == 200:
             logging.info(f"Пользователь уже есть: {response.status_code}")
         elif response.status_code == 201:
             logging.info("Пользователь создан")
-            await send_message(SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}")
+            await send_message(
+                SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}"
+            )
         else:
             logging.info(f"Пользователь не создан: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Пользователь не создан")
@@ -182,9 +176,6 @@ async def get_target_date(message: types.Message, state: FSMContext):
     application_dict = application_storage.to_dict()
     application_id = False
     try:
-        # response_test = await make_post_request_with_auth(ENDPONT_CREATE_APPLICATION)
-        # if response_test:
-        #     logging.info(f"НАСТЯ АФИГЕТЬ ЧТО-ТО ПОЛУЧИЛОСЬ: {response_test}")
         response = await make_post_request(
             ENDPONT_CREATE_APPLICATION, application_dict
         )
@@ -289,8 +280,36 @@ async def get_application_list(message: Message):
 @router.message(F.text.lower() == "мои юр. лица")
 async def answer_no1(message: Message):
     """Обрабатывает клик по кнопке."""
-    tg_id = message.from_user.id
-    response = await make_get_request(ENDPONT_GET_APPLICATION_LIST, tg_id)
-    logging.info(response)
-    await message.answer("Пока не работает!") # TODO Получить по api название компании
-    logging.info("Пользователь запросил юр. лица")
+    logging.info("Пользователь запросил компании")
+    tg_id = str(message.from_user.id)
+    company_list = False
+    try:
+        response = await make_get_request(ENDPONT_GET_COMPANY_LIST, tg_id)
+        if response.status_code != 200:
+            logging.info(
+                f"Список компаний не получен ответ: {response.status_code}"
+            )
+            await send_message(
+                SERVICE_CHAT_ID,
+                f"Список компаний не получен ответ: {response.status_code}"
+            )
+        company_list = json.loads(response.text)
+        logging.info(f"Ответ от БД получен {company_list}")
+    except Exception as e:
+        logging.info(f"Ошибка при получение спиcка компаний: {e}")
+        await send_message(
+            SERVICE_CHAT_ID, f"Ошибка при получение спиcка компаний: {e}"
+        )
+        await message.answer(TECH_MESSAGES["api_error"])
+
+    if company_list:
+        for company in company_list:
+            answer = MESSAGES["company"].format(
+                company["company_name"],
+                company["company_inn"]
+            )
+            await message.answer(f"Ваши компании: {answer}")
+        logging.info("Пользователь получил список компаний")
+    else:
+        await message.answer("Создайте первую заявку, для добавления компании.")
+        logging.info("Пользователь получил список заявок (пустой)")

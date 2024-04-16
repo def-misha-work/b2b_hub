@@ -15,6 +15,7 @@ MANAGER_CHAT_ID = os.getenv("MANAGER_CHAT_ID")
 ENDPONT_CREATE_USER = "http://backend:8000/tguser/"
 ENDPONT_CREATE_APPLICATION = "http://backend:8000/application/"
 ENDPONT_GET_APPLICATION_LIST = "http://backend:8000/application/my/"
+ENDPONT_GET_COMPANY_LIST = "http://backend:8000/company/my/"
 
 BASIC_USER_LOGIN = os.getenv("BASIC_USER_LOGIN")
 BASIC_USER_PASSWORD = os.getenv("BASIC_USER_PASSWORD")
@@ -28,6 +29,8 @@ MESSAGES = {
     "step4": "Шаг 4 из 4:\nВведите дату к которой заявку нужно выполнить, в формате: дд.мм.гг.\nНапример: '20.10.25' или '20.10.2025'", # noqa
     "application": "\nНомер заявки: {}\nИНН плательщика: {},\nИНН получателя: {},\nСумма заявки: {},\nДата выполнения заявки: {}", # noqa
     "application_created": "Ваша заявка создана:\nМы свяжемся в Вами в ближайшее рабочее время. Спасибо!", # noqa
+    "company": "\nНазвание компании: {}\nИНН компании: {}", # noqa
+
 }
 MESSAGES_TO_MANAGER = {
     "application_created": "Заявка от пользователя: {},\nНик в TG: @{}\nЗаявка: {}", # noqa
