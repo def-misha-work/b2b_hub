@@ -206,12 +206,12 @@ async def get_target_date(message: types.Message, state: FSMContext):
             application_storage.application_cost,
             application_storage.target_date
         )
-        application_to_manager = MESSAGES_TO_MANAGER["application_created"].format(
+        appl_to_manager = MESSAGES_TO_MANAGER["application_created"].format(
             message.from_user.first_name,
             message.from_user.username,
             application_info
         )
-        await send_message(SERVICE_CHAT_ID, application_to_manager)
+        await send_message(SERVICE_CHAT_ID, appl_to_manager)
         logging.info("Заявка отправлена в саппорт")
         # Отправляем менеджеру
         # await send_message(MANAGER_CHAT_ID, application_to_manager) TODO Расскоментить на бою. # noqa
@@ -229,7 +229,9 @@ async def invalid_values_target_date(
     state: FSMContext
 ):
     """Валидация даты."""
-    await message.answer("Внимание! Дата должна быть в формате: 20.10.25, и не ранее текущего дня.")
+    await message.answer(
+        "Введите дату в формате: 20.10.25, не ранее текущего дня."
+    )
     await message.answer(MESSAGES["step4"])
     await state.set_state(NewApplication.step_4)
     logging.info("Ошибка на шаге 4")
@@ -308,8 +310,10 @@ async def answer_no1(message: Message):
                 company["company_name"],
                 company["company_inn"]
             )
-            await message.answer(f"Ваши компании: {answer}")
+            await message.answer(answer)
         logging.info("Пользователь получил список компаний")
     else:
-        await message.answer("Создайте первую заявку, для добавления компании.")
+        await message.answer(
+            "Создайте первую заявку, для добавления компании."
+        )
         logging.info("Пользователь получил список заявок (пустой)")
