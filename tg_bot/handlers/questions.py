@@ -9,9 +9,12 @@ from aiogram.fsm.context import FSMContext
 from dotenv import load_dotenv
 
 from keyboards.for_questions import get_menu
-from requests import make_post_request, make_get_request
+from requests import (
+    make_post_request,
+    make_get_request,
+)
 from storage import UserStorage, ApplicationStorage
-from utils import send_message
+from utils import send_message, get_dadata_company_name
 from validators import validate_date
 from constants import (
     MESSAGES,
@@ -91,9 +94,18 @@ async def application_step_one(message: Message, state: FSMContext):
 )
 async def get_inn_payer(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 10 символов."""
-    inn_payer = [int(message.text)]
-    application_storage.update_inn_payer(inn_payer)
+    inn_payer = int(message.text)
+    application_storage.update_inn_payer([inn_payer])
     await message.answer(f"Вы ввели ИНН плательщика: {inn_payer}")
+
+    company_name = await get_dadata_company_name(inn_payer)
+    if not company_name:
+        await message.answer(TECH_MESSAGES["company_error"])
+        await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
+        logging.info(TECH_MESSAGES["company_error"])
+    else:
+        await message.answer(f"Название вашей компании: {company_name}")
+
     await message.answer(MESSAGES["step2"])
     await state.set_state(NewApplication.step_2)
     logging.info("Успех шаг 1")
@@ -115,8 +127,8 @@ async def invalid_values_inn_payer(message: types.Message, state: FSMContext):
 )
 async def get_inn_recipient(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 12 символов."""
-    inn_recipient = [int(message.text)]
-    application_storage.update_inn_recipient(inn_recipient)
+    inn_recipient = int(message.text)
+    application_storage.update_inn_recipient([inn_recipient])
     await message.answer(f"Вы ввели ИНН получателя: {inn_recipient}")
     await message.answer(MESSAGES["step3"])
     await state.set_state(NewApplication.step_3)
@@ -242,7 +254,6 @@ async def get_application_list(message: Message):
     """Обрабатывает клик по кнопке Список заявок."""
     logging.info("Пользователь запросил заявки")
     tg_id = str(message.from_user.id)
-    logging.info(f"Это tg_id {tg_id}, {type(tg_id)})")
     application_list = False
     try:
         response = await make_get_request(ENDPONT_GET_APPLICATION_LIST, tg_id)
@@ -277,6 +288,7 @@ async def get_application_list(message: Message):
     else:
         await message.answer("У вас нет активных заявок.")
         logging.info("Пользователь получил список заявок (пустой)")
+    await message.answer(MESSAGES["menu"], reply_markup=get_menu())
 
 
 @router.message(F.text.lower() == "мои юр. лица")
