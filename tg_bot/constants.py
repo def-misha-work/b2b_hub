@@ -16,6 +16,9 @@ ENDPONT_CREATE_USER = "http://backend:8000/tguser/"
 ENDPONT_CREATE_APPLICATION = "http://backend:8000/application/"
 ENDPONT_GET_APPLICATION_LIST = "http://backend:8000/application/my/"
 
+BASIC_USER_LOGIN = os.getenv("BASIC_USER_LOGIN")
+BASIC_USER_PASSWORD = os.getenv("BASIC_USER_PASSWORD")
+
 MESSAGES = {
     "start": "Добрый день, {}!\nСервис B2Bhub приветствует Вас!",
     "menu": "Это Меню, выберите что Вы хотите сделать:",
