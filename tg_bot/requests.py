@@ -33,6 +33,16 @@ async def get_company_name(inn):
             return None
 
 
+async def make_patch_request(url, data):
+    async with httpx.AsyncClient() as client:
+        response = await client.patch(
+            url,
+            json=data,
+            auth=(BASIC_USER_LOGIN, BASIC_USER_PASSWORD)
+        )
+        return response
+
+
 async def make_post_request(url, data):
     async with httpx.AsyncClient() as client:
         response = await client.post(

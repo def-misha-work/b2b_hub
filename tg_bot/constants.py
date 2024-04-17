@@ -16,6 +16,7 @@ ENDPONT_CREATE_USER = "http://backend:8000/tguser/"
 ENDPONT_CREATE_APPLICATION = "http://backend:8000/application/"
 ENDPONT_GET_APPLICATION_LIST = "http://backend:8000/application/my/"
 ENDPONT_GET_COMPANY_LIST = "http://backend:8000/company/my/"
+ENDPONT_PATCH_COMPANY = "http://backend:8000/company/"
 ENDPONT_GET_COMPANY_NAME = "http://suggestions.dadata.ru/suggestions/api/4_1/rs/findById/party" # noqa
 DADATA_API_KEY = "c132632530b566d1a154c8379ce78e6d6b1c9713"
 

@@ -12,8 +12,9 @@ from keyboards.for_questions import get_menu
 from requests import (
     make_post_request,
     make_get_request,
+    make_patch_request,
 )
-from storage import UserStorage, ApplicationStorage
+from storage import UserStorage, ApplicationStorage, CompanyStorage
 from utils import send_message, get_dadata_company_name
 from validators import validate_date
 from constants import (
@@ -25,12 +26,14 @@ from constants import (
     MESSAGES_TO_MANAGER,
     ENDPONT_GET_APPLICATION_LIST,
     ENDPONT_GET_COMPANY_LIST,
+    ENDPONT_PATCH_COMPANY,
 )
 
 
 load_dotenv()
 router = Router()
 application_storage = ApplicationStorage()
+company_storage_list = []
 
 
 class NewApplication(StatesGroup):
@@ -104,6 +107,8 @@ async def get_inn_payer(message: types.Message, state: FSMContext):
         await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
         logging.info(TECH_MESSAGES["company_error"])
     else:
+        company_storage = CompanyStorage(inn_payer, company_name)
+        company_storage_list.append(company_storage)
         await message.answer(f"Название вашей компании: {company_name}")
 
     await message.answer(MESSAGES["step2"])
@@ -130,6 +135,17 @@ async def get_inn_recipient(message: types.Message, state: FSMContext):
     inn_recipient = int(message.text)
     application_storage.update_inn_recipient([inn_recipient])
     await message.answer(f"Вы ввели ИНН получателя: {inn_recipient}")
+
+    company_name = await get_dadata_company_name(inn_recipient)
+    if not company_name:
+        await message.answer(TECH_MESSAGES["company_error"])
+        await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
+        logging.info(TECH_MESSAGES["company_error"])
+    else:
+        company_storage = CompanyStorage(inn_recipient, company_name)
+        company_storage_list.append(company_storage)
+        await message.answer(f"Название вашей компании: {company_name}")
+
     await message.answer(MESSAGES["step3"])
     await state.set_state(NewApplication.step_3)
     logging.info("Успех шаг 2")
@@ -230,6 +246,21 @@ async def get_target_date(message: types.Message, state: FSMContext):
         # logging.info("Заявка отправлена менеджеру")
         await message.answer("Ваша заявка:" + application_info)
         await message.answer(MESSAGES["application_created"])
+
+        # Обновляем информацию о компаниях в базе.
+        global company_storage_list
+        for company in company_storage_list:
+            company_patch_url = f"{ENDPONT_PATCH_COMPANY}{company.company_inn}/update"
+            logging.info(company.to_dict())
+            try:
+                response = await make_patch_request(
+                    company_patch_url,
+                    company.to_dict()
+                )
+                logging.info(f"Имя компаний {company.company_name} обновленно")
+            except Exception as e:
+                logging.info(f"Ошибка {e} запроса обновления компании")
+        company_storage_list = []
         await state.set_state(None)
         await message.answer(MESSAGES["menu"], reply_markup=get_menu())
         logging.info("Пользователь в меню")
@@ -293,7 +324,7 @@ async def get_application_list(message: Message):
 
 @router.message(F.text.lower() == "мои юр. лица")
 async def answer_no1(message: Message):
-    """Обрабатывает клик по кнопке."""
+    """Обрабатывает клик по кнопке 'мои юр. лица'."""
     logging.info("Пользователь запросил компании")
     tg_id = str(message.from_user.id)
     company_list = False
@@ -329,3 +360,5 @@ async def answer_no1(message: Message):
             "Создайте первую заявку, для добавления компании."
         )
         logging.info("Пользователь получил список заявок (пустой)")
+
+    await message.answer(MESSAGES["menu"], reply_markup=get_menu())
