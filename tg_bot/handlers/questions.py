@@ -15,7 +15,8 @@ from requests import (
     make_patch_request,
 )
 from storage import UserStorage, ApplicationStorage, CompanyStorage
-from utils import send_message, get_dadata_company_name
+# from utils import send_message, get_dadata_company_name
+from utils import send_message
 from validators import validate_date
 from constants import (
     MESSAGES,
@@ -27,6 +28,7 @@ from constants import (
     ENDPONT_GET_APPLICATION_LIST,
     ENDPONT_GET_COMPANY_LIST,
     ENDPONT_PATCH_COMPANY,
+    MANAGER_CHAT_ID
 )
 
 
@@ -62,22 +64,22 @@ async def cmd_start(message: Message, state: FSMContext):
         if response.status_code == 200:
             logging.info(f"Пользователь уже есть: {response.status_code}")
         elif response.status_code == 201:
-            logging.info("Пользователь создан")
+            logging.info(f"Пользователь создан @{tg_username}")
             await send_message(
                 SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}"
             )
         else:
             logging.info(f"Пользователь не создан: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Пользователь не создан")
-        # await send_message(SERVICE_CHAT_ID, "Пользователь создан") TODO Раскомментировать на бой. # noqa
-        # await send_message(SERVICE_CHAT_ID, "Пользователь создан") TODO Сделать отправку Боре. # noqa
+        await send_message(SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}")
+        await send_message(MANAGER_CHAT_ID, f"Новый пользователь @{tg_username}")
     except Exception as e:
         logging.info(f"Ошибка при создании пользователя: {e}")
         await send_message(SERVICE_CHAT_ID, "Ошибка создания пользователя")
 
     await message.answer(MESSAGES["start"].format(tg_name))
     await message.answer(MESSAGES["menu"], reply_markup=get_menu())
-    logging.info("Пользователь в меню")
+    logging.info(f"Пользователь @{tg_username} в меню")
 
 
 # Старт цепочки создание заявки step_1
@@ -101,15 +103,15 @@ async def get_inn_payer(message: types.Message, state: FSMContext):
     application_storage.update_inn_payer([inn_payer])
     await message.answer(f"Вы ввели ИНН плательщика: {inn_payer}")
 
-    company_name = await get_dadata_company_name(inn_payer)
-    if not company_name:
-        await message.answer(TECH_MESSAGES["company_error"])
-        await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
-        logging.info(TECH_MESSAGES["company_error"])
-    else:
-        company_storage = CompanyStorage(inn_payer, company_name)
-        company_storage_list.append(company_storage)
-        await message.answer(f"Название вашей компании: {company_name}")
+    # company_name = await get_dadata_company_name(inn_payer)
+    # if not company_name:
+    #     await message.answer(TECH_MESSAGES["company_error"])
+    #     await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
+    #     logging.info(TECH_MESSAGES["company_error"])
+    # else:
+    #     company_storage = CompanyStorage(inn_payer, company_name)
+    #     company_storage_list.append(company_storage)
+    #     await message.answer(f"Название вашей компании: {company_name}")
 
     await message.answer(MESSAGES["step2"])
     await state.set_state(NewApplication.step_2)
@@ -136,15 +138,15 @@ async def get_inn_recipient(message: types.Message, state: FSMContext):
     application_storage.update_inn_recipient([inn_recipient])
     await message.answer(f"Вы ввели ИНН получателя: {inn_recipient}")
 
-    company_name = await get_dadata_company_name(inn_recipient)
-    if not company_name:
-        await message.answer(TECH_MESSAGES["company_error"])
-        await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
-        logging.info(TECH_MESSAGES["company_error"])
-    else:
-        company_storage = CompanyStorage(inn_recipient, company_name)
-        company_storage_list.append(company_storage)
-        await message.answer(f"Название вашей компании: {company_name}")
+    # company_name = await get_dadata_company_name(inn_recipient)
+    # if not company_name:
+    #     await message.answer(TECH_MESSAGES["company_error"])
+    #     await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
+    #     logging.info(TECH_MESSAGES["company_error"])
+    # else:
+    #     company_storage = CompanyStorage(inn_recipient, company_name)
+    #     company_storage_list.append(company_storage)
+    #     await message.answer(f"Название вашей компании: {company_name}")
 
     await message.answer(MESSAGES["step3"])
     await state.set_state(NewApplication.step_3)
@@ -234,16 +236,16 @@ async def get_target_date(message: types.Message, state: FSMContext):
             application_storage.application_cost,
             application_storage.target_date
         )
-        appl_to_manager = MESSAGES_TO_MANAGER["application_created"].format(
+        application_to_manager = MESSAGES_TO_MANAGER["application_created"].format(
             message.from_user.first_name,
             message.from_user.username,
             application_info
         )
-        await send_message(SERVICE_CHAT_ID, appl_to_manager)
+        await send_message(SERVICE_CHAT_ID, application_to_manager)
         logging.info("Заявка отправлена в саппорт")
         # Отправляем менеджеру
-        # await send_message(MANAGER_CHAT_ID, application_to_manager) TODO Расскоментить на бою. # noqa
-        # logging.info("Заявка отправлена менеджеру")
+        await send_message(MANAGER_CHAT_ID, application_to_manager)
+        logging.info("Заявка отправлена менеджеру")
         await message.answer("Ваша заявка:" + application_info)
         await message.answer(MESSAGES["application_created"])
 
