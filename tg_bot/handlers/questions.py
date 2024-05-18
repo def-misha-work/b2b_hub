@@ -86,10 +86,12 @@ async def cmd_start(message: Message, state: FSMContext):
 @router.message(StateFilter(None), F.text.lower() == "новая заявка")
 async def application_step_one(message: Message, state: FSMContext):
     """Обрабатывает клик по кнопке и запускает цепочку Новая заявка."""
+
+    tg_username = message.from_user.username
     application_storage.update_tg_id(message.from_user.id)
     await message.answer(MESSAGES["step1"])
     await state.set_state(NewApplication.step_1)
-    logging.info("Начато создание новой заявки")
+    logging.info(f"@{tg_username} начал создание новой заявки")
 
 
 # Обработка inn_payer step_1
@@ -202,7 +204,7 @@ async def get_target_date(message: types.Message, state: FSMContext):
     target_date = message.text
     application_storage.update_target_date(target_date)
     logging.info("Успех шаг 4")
-
+    tg_username = message.from_user.username
     application_dict = application_storage.to_dict()
     application_id = False
     try:
@@ -242,6 +244,7 @@ async def get_target_date(message: types.Message, state: FSMContext):
             application_info
         )
         await send_message(SERVICE_CHAT_ID, application_to_manager)
+        await send_message(MANAGER_CHAT_ID, application_to_manager)
         logging.info("Заявка отправлена в саппорт")
         # Отправляем менеджеру
         await send_message(MANAGER_CHAT_ID, application_to_manager)
@@ -265,7 +268,7 @@ async def get_target_date(message: types.Message, state: FSMContext):
         company_storage_list = []
         await state.set_state(None)
         await message.answer(MESSAGES["menu"], reply_markup=get_menu())
-        logging.info("Пользователь в меню")
+        logging.info(f"Пользователь {tg_username} в меню")
 
 
 @router.message(F.text, NewApplication.step_4)
@@ -301,7 +304,7 @@ async def get_application_list(message: Message):
         application_list = json.loads(response.text)
         logging.info(f"Ответ от БД получен {application_list}")
     except Exception as e:
-        logging.info(f"Ошибка при получение спика заявок: {e}")
+        logging.info(f"Ошибка при получение спиcка заявок: {e}")
         await send_message(
             SERVICE_CHAT_ID, f"Ошибка при получение спика заявок: {e}"
         )
@@ -318,10 +321,14 @@ async def get_application_list(message: Message):
             )
             await message.answer(f"Ваши заявки: {answer}")
         logging.info("Пользователь получил список заявок")
+
+        await message.answer(MESSAGES["menu"], reply_markup=get_menu())
+        logging.info("Пользователь в меню")
     else:
         await message.answer("У вас нет активных заявок.")
         logging.info("Пользователь получил список заявок (пустой)")
     await message.answer(MESSAGES["menu"], reply_markup=get_menu())
+    logging.info("Пользователь в меню")
 
 
 @router.message(F.text.lower() == "мои юр. лица")
@@ -364,3 +371,4 @@ async def answer_no1(message: Message):
         logging.info("Пользователь получил список заявок (пустой)")
 
     await message.answer(MESSAGES["menu"], reply_markup=get_menu())
+    logging.info("Пользователь в меню")
