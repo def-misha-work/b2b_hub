@@ -12,9 +12,9 @@ class CRUDApplication(CRUDBase):
     ...
 
     async def create_application(
-            self,
-            application,
-            session: AsyncSession,
+        self,
+        application,
+        session: AsyncSession,
     ):
         """Создать новую заявку."""
         application_data = application.dict()
@@ -29,9 +29,9 @@ class CRUDApplication(CRUDBase):
         return new_application
 
     async def get_application_by_id(
-            self,
-            application_id: int,
-            session: AsyncSession,
+        self,
+        application_id: int,
+        session: AsyncSession,
     ) -> Optional[Application]:
         """Получить заявку по id."""
         db_application = await session.execute(
@@ -42,9 +42,9 @@ class CRUDApplication(CRUDBase):
         return db_application.scalars().first()
 
     async def get_applications_ids_by_tg_user_id(
-            self,
-            tg_user_id: int,
-            session: AsyncSession,
+        self,
+        tg_user_id: int,
+        session: AsyncSession,
     ) -> Optional[List[Application]]:
         """Получить все id заявок по id telegram-пользователя."""
         db_applications = await session.execute(

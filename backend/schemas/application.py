@@ -45,14 +45,6 @@ class ApplicationUpdate(ApplicationCreate):
         return value
 
 
-# class ApplicationDB(ApplicationCreate):
-#     """Схема заявки в БД."""
-#     id: int
-#
-#     class Config:
-#         orm_mode = True
-
-
 class ApplicationResponse(ApplicationCreate):
     """Схема заявки в БД."""
     id: int

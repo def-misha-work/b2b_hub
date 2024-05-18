@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$DATABASE" = "b2b_hub_db" ]
+if [ "$DATABASE" = "b2b_test_hub_db" ]
 then
     echo "Waiting for postgres..."
 
@@ -12,8 +12,7 @@ then
 fi
 # shellcheck disable=SC1083
 #uvicorn project.web.main:web --reload --host=0.0.0.0 --port="$PORT 8000"
-
-# alembic revision --autogenerate -m "Initianal migration"
+# alembic revision --autogenerate -m "1 migration"
 # alembic upgrade head
 uvicorn main:app --reload --host=0.0.0.0 --port=8000
 

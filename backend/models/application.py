@@ -8,7 +8,6 @@ from core.db import Base
 
 class Application(Base):
     """Модель заявки."""
-    # Дата создания заявки
     create_date = Column(
         DateTime,
         default=lambda: CREATE_DATE_DEFAULT,
@@ -18,10 +17,8 @@ class Application(Base):
         String,
         nullable=False,
     )
-    # Сумма заявки
     cost = Column(
         Float,
         nullable=False,
     )
-    # Ссылка на пользователя
     tg_user_id = Column(BigInteger, ForeignKey(TG_USER_FOREIGN_KEY))

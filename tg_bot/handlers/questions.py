@@ -6,20 +6,36 @@ from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-
+from dotenv import load_dotenv
 
 from keyboards.for_questions import get_menu
-from requests import make_post_request, make_get_request
-from storage import UserStorage, ApplicationStorage
+from requests import (
+    make_post_request,
+    make_get_request,
+    make_patch_request,
+)
+from storage import UserStorage, ApplicationStorage, CompanyStorage
+# from utils import send_message, get_dadata_company_name
 from utils import send_message
 from validators import validate_date
 from constants import (
-    MESSAGES, MANAGER_CHAT_ID, TECH_MESSAGES, ENDPONT_CREATE_USER, SERVICE_CHAT_ID, ENDPONT_CREATE_APPLICATION, MESSAGES_TO_MANAGER, ENDPONT_GET_APPLICATION_LIST,
+    MESSAGES,
+    TECH_MESSAGES,
+    ENDPONT_CREATE_USER,
+    SERVICE_CHAT_ID,
+    ENDPONT_CREATE_APPLICATION,
+    MESSAGES_TO_MANAGER,
+    ENDPONT_GET_APPLICATION_LIST,
+    ENDPONT_GET_COMPANY_LIST,
+    ENDPONT_PATCH_COMPANY,
+    MANAGER_CHAT_ID
 )
 
 
+load_dotenv()
 router = Router()
 application_storage = ApplicationStorage()
+company_storage_list = []
 
 
 class NewApplication(StatesGroup):
@@ -48,20 +64,22 @@ async def cmd_start(message: Message, state: FSMContext):
         if response.status_code == 200:
             logging.info(f"Пользователь уже есть: {response.status_code}")
         elif response.status_code == 201:
-            logging.info("Пользователь создан")
-            await send_message(SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}")
-
-            await send_message(MANAGER_CHAT_ID, f"Новый пользователь @{tg_username}")
+            logging.info(f"Пользователь создан @{tg_username}")
+            await send_message(
+                SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}"
+            )
         else:
             logging.info(f"Пользователь не создан: {response.status_code}")
             await send_message(SERVICE_CHAT_ID, "Пользователь не создан")
+        await send_message(SERVICE_CHAT_ID, f"Новый пользователь @{tg_username}")
+        await send_message(MANAGER_CHAT_ID, f"Новый пользователь @{tg_username}")
     except Exception as e:
         logging.info(f"Ошибка при создании пользователя: {e}")
         await send_message(SERVICE_CHAT_ID, "Ошибка создания пользователя")
 
     await message.answer(MESSAGES["start"].format(tg_name))
     await message.answer(MESSAGES["menu"], reply_markup=get_menu())
-    logging.info(f"Пользователь {tg_username} в меню")
+    logging.info(f"Пользователь @{tg_username} в меню")
 
 
 # Старт цепочки создание заявки step_1
@@ -83,9 +101,20 @@ async def application_step_one(message: Message, state: FSMContext):
 )
 async def get_inn_payer(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 10 символов."""
-    inn_payer = [int(message.text)]
-    application_storage.update_inn_payer(inn_payer)
+    inn_payer = int(message.text)
+    application_storage.update_inn_payer([inn_payer])
     await message.answer(f"Вы ввели ИНН плательщика: {inn_payer}")
+
+    # company_name = await get_dadata_company_name(inn_payer)
+    # if not company_name:
+    #     await message.answer(TECH_MESSAGES["company_error"])
+    #     await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
+    #     logging.info(TECH_MESSAGES["company_error"])
+    # else:
+    #     company_storage = CompanyStorage(inn_payer, company_name)
+    #     company_storage_list.append(company_storage)
+    #     await message.answer(f"Название вашей компании: {company_name}")
+
     await message.answer(MESSAGES["step2"])
     await state.set_state(NewApplication.step_2)
     logging.info("Успех шаг 1")
@@ -107,9 +136,20 @@ async def invalid_values_inn_payer(message: types.Message, state: FSMContext):
 )
 async def get_inn_recipient(message: types.Message, state: FSMContext):
     """Обработка сообщения с числом из ровно 12 символов."""
-    inn_recipient = [int(message.text)]
-    application_storage.update_inn_recipient(inn_recipient)
+    inn_recipient = int(message.text)
+    application_storage.update_inn_recipient([inn_recipient])
     await message.answer(f"Вы ввели ИНН получателя: {inn_recipient}")
+
+    # company_name = await get_dadata_company_name(inn_recipient)
+    # if not company_name:
+    #     await message.answer(TECH_MESSAGES["company_error"])
+    #     await send_message(SERVICE_CHAT_ID, TECH_MESSAGES["company_error"])
+    #     logging.info(TECH_MESSAGES["company_error"])
+    # else:
+    #     company_storage = CompanyStorage(inn_recipient, company_name)
+    #     company_storage_list.append(company_storage)
+    #     await message.answer(f"Название вашей компании: {company_name}")
+
     await message.answer(MESSAGES["step3"])
     await state.set_state(NewApplication.step_3)
     logging.info("Успех шаг 2")
@@ -206,8 +246,26 @@ async def get_target_date(message: types.Message, state: FSMContext):
         await send_message(SERVICE_CHAT_ID, application_to_manager)
         await send_message(MANAGER_CHAT_ID, application_to_manager)
         logging.info("Заявка отправлена в саппорт")
+        # Отправляем менеджеру
+        await send_message(MANAGER_CHAT_ID, application_to_manager)
+        logging.info("Заявка отправлена менеджеру")
         await message.answer("Ваша заявка:" + application_info)
         await message.answer(MESSAGES["application_created"])
+
+        # Обновляем информацию о компаниях в базе.
+        global company_storage_list
+        for company in company_storage_list:
+            company_patch_url = f"{ENDPONT_PATCH_COMPANY}{company.company_inn}/update"
+            logging.info(company.to_dict())
+            try:
+                response = await make_patch_request(
+                    company_patch_url,
+                    company.to_dict()
+                )
+                logging.info(f"Имя компаний {company.company_name} обновленно")
+            except Exception as e:
+                logging.info(f"Ошибка {e} запроса обновления компании")
+        company_storage_list = []
         await state.set_state(None)
         await message.answer(MESSAGES["menu"], reply_markup=get_menu())
         logging.info(f"Пользователь {tg_username} в меню")
@@ -219,7 +277,9 @@ async def invalid_values_target_date(
     state: FSMContext
 ):
     """Валидация даты."""
-    await message.answer("Внимание! Дата должна быть в формате: 20.10.25, и не ранее текущего дня.")
+    await message.answer(
+        "Введите дату в формате: 20.10.25, не ранее текущего дня."
+    )
     await message.answer(MESSAGES["step4"])
     await state.set_state(NewApplication.step_4)
     logging.info("Ошибка на шаге 4")
@@ -230,7 +290,6 @@ async def get_application_list(message: Message):
     """Обрабатывает клик по кнопке Список заявок."""
     logging.info("Пользователь запросил заявки")
     tg_id = str(message.from_user.id)
-    logging.info(f"Это tg_id {tg_id}, {type(tg_id)})")
     application_list = False
     try:
         response = await make_get_request(ENDPONT_GET_APPLICATION_LIST, tg_id)
@@ -268,17 +327,48 @@ async def get_application_list(message: Message):
     else:
         await message.answer("У вас нет активных заявок.")
         logging.info("Пользователь получил список заявок (пустой)")
-        await message.answer(MESSAGES["menu"], reply_markup=get_menu())
-        logging.info("Пользователь в меню")
+    await message.answer(MESSAGES["menu"], reply_markup=get_menu())
+    logging.info("Пользователь в меню")
 
 
 @router.message(F.text.lower() == "мои юр. лица")
 async def answer_no1(message: Message):
-    """Обрабатывает клик по кнопке."""
-    tg_id = message.from_user.id
-    response = await make_get_request(ENDPONT_GET_APPLICATION_LIST, tg_id)
-    logging.info(response)
-    await message.answer("Пока не работает, но тут будет список юр. лиц") # TODO Получить по api название компании
-    logging.info("Пользователь запросил юр. лица")
+    """Обрабатывает клик по кнопке 'мои юр. лица'."""
+    logging.info("Пользователь запросил компании")
+    tg_id = str(message.from_user.id)
+    company_list = False
+    try:
+        response = await make_get_request(ENDPONT_GET_COMPANY_LIST, tg_id)
+        if response.status_code != 200:
+            logging.info(
+                f"Список компаний не получен ответ: {response.status_code}"
+            )
+            await send_message(
+                SERVICE_CHAT_ID,
+                f"Список компаний не получен ответ: {response.status_code}"
+            )
+        company_list = json.loads(response.text)
+        logging.info(f"Ответ от БД получен {company_list}")
+    except Exception as e:
+        logging.info(f"Ошибка при получение спиcка компаний: {e}")
+        await send_message(
+            SERVICE_CHAT_ID, f"Ошибка при получение спиcка компаний: {e}"
+        )
+        await message.answer(TECH_MESSAGES["api_error"])
+
+    if company_list:
+        for company in company_list:
+            answer = MESSAGES["company"].format(
+                company["company_name"],
+                company["company_inn"]
+            )
+            await message.answer(answer)
+        logging.info("Пользователь получил список компаний")
+    else:
+        await message.answer(
+            "Создайте первую заявку, для добавления компании."
+        )
+        logging.info("Пользователь получил список заявок (пустой)")
+
     await message.answer(MESSAGES["menu"], reply_markup=get_menu())
     logging.info("Пользователь в меню")

@@ -10,9 +10,9 @@ ENV PYTHONUNBUFFERED 1
 ENV PYTHONPATH=/home/app/backend
 
 # install system dependencies
-RUN apt-get update \
-  && apt-get -y install netcat-traditional gcc postgresql \
-  && apt-get clean
+#RUN apt-get update \
+#  && apt-get -y install netcat-traditional gcc postgresql \
+#  && apt-get clean
 
 # install python dependencies
 RUN pip install --upgrade pip

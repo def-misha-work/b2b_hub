@@ -59,3 +59,18 @@ class ApplicationStorage():
             'inn_recipient': self.inn_recipient,
             'tg_user_id': self.tg_id,
         }
+
+
+class CompanyStorage():
+    def __init__(self, company_inn, company_name=None):
+        self.company_inn = company_inn
+        self.company_name = company_name
+
+    def update_company_name(self, new_company_name):
+        self.company_name = new_company_name
+
+    def to_dict(self):
+        return {
+            'company_inn': self.company_inn,
+            'company_name': self.company_name,
+        }

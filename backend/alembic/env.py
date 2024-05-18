@@ -12,7 +12,7 @@ from alembic import context
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
-from backend.core.base import Base
+from core.base import Base
 
 load_dotenv('.env')
 # this is the Alembic Config object, which provides
