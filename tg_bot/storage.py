@@ -21,14 +21,18 @@ class ApplicationStorage():
         self,
         tg_id=None,
         inn_payer=None,
+        name_payer=None,
         inn_recipient=None,
+        name_recipient=None,
         application_cost=None,
         target_date=None,
         application_id=None
     ):
         self.tg_id = tg_id
         self.inn_payer = inn_payer
+        self.name_payer = name_payer
         self.inn_recipient = inn_recipient
+        self.name_recipient = name_recipient
         self.application_cost = application_cost
         self.target_date = target_date
         self.application_id = application_id
@@ -39,8 +43,14 @@ class ApplicationStorage():
     def update_inn_payer(self, new_inn_payer):
         self.inn_payer = new_inn_payer
 
+    def update_name_payer(self, new_name_payer):
+        self.name_payer = new_name_payer
+
     def update_inn_recipient(self, new_inn_recipient):
         self.inn_recipient = new_inn_recipient
+
+    def update_name_recipient(self, new_name_recipient):
+        self.name_recipient = new_name_recipient
 
     def update_application_cost(self, new_application_cost):
         self.application_cost = new_application_cost
@@ -56,21 +66,23 @@ class ApplicationStorage():
             'target_date': self.target_date,
             'cost': self.application_cost,
             'inn_payer': self.inn_payer,
+            'name_payer': self.name_payer,
             'inn_recipient': self.inn_recipient,
+            'name_recipient': self.name_recipient,
             'tg_user_id': self.tg_id,
         }
 
 
-class CompanyStorage():
-    def __init__(self, company_inn, company_name=None):
-        self.company_inn = company_inn
-        self.company_name = company_name
+# class CompanyStorage():
+#     def __init__(self, company_inn, company_name=None):
+#         self.company_inn = company_inn
+#         self.company_name = company_name
 
-    def update_company_name(self, new_company_name):
-        self.company_name = new_company_name
+#     def update_company_name(self, new_company_name):
+#         self.company_name = new_company_name
 
-    def to_dict(self):
-        return {
-            'company_inn': self.company_inn,
-            'company_name': self.company_name,
-        }
+#     def to_dict(self):
+#         return {
+#             'company_inn': self.company_inn,
+#             'company_name': self.company_name,
+#         }

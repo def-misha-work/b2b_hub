@@ -34,10 +34,15 @@ async def get_company_name(inn):
 
 
 async def make_patch_request(url, data):
+    url_params = {
+        "company_inn": data["company_inn"],
+        "company_name": f"'{data['company_name']}'"
+    }
     async with httpx.AsyncClient() as client:
         response = await client.patch(
             url,
-            json=data,
+            params=url_params,
+            # json=data,
             auth=(BASIC_USER_LOGIN, BASIC_USER_PASSWORD)
         )
         return response
@@ -50,6 +55,10 @@ async def make_post_request(url, data):
             json=data,
             auth=(BASIC_USER_LOGIN, BASIC_USER_PASSWORD)
         )
+        if response.status_code != 201:
+            logging.info(
+                f"Заявка не создана получен ответ: {response.status_code}"
+            )
         return response
 
 
@@ -59,5 +68,8 @@ async def make_get_request(url, value):
             f"{url}{value}",
             auth=(BASIC_USER_LOGIN, BASIC_USER_PASSWORD)
         )
-        logging.info(f"Это урл: {response.url}")
+        if response.status_code != 200:
+            logging.info(
+                f"Список заявок не получен, ответ: {response.status_code}"
+            )
         return response
