@@ -1,8 +1,8 @@
-"""Update BigInteger
+"""Database creation
 
-Revision ID: 677c34ce52c0
+Revision ID: 2d1b13ae4061
 Revises: 
-Create Date: 2024-03-26 21:35:49.925062
+Create Date: 2024-04-08 21:27:43.856790
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '677c34ce52c0'
+revision = '2d1b13ae4061'
 down_revision = None
 branch_labels = None
 depends_on = None
