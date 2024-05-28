@@ -6,7 +6,7 @@ from api.validators import check_application_exists
 from constants import CLEAR_ROUTE
 from core.db import get_async_session
 from core.user import get_current_username
-from crud import application_crud, application_company_crud
+from crud import application_crud, application_company_crud, company_crud
 from services.application_process import add_field_to_combined_table
 from schemas.application import ApplicationCreate, ApplicationResponse
 
@@ -27,15 +27,21 @@ async def get_application_by_id(
     app = await application_crud.get_application_by_id(application_id, session)
     if app:
         extra_data = await application_company_crud.get_objs_by_application_id(application_id, session)
-        payer = []
-        recipient = []
+        payer_info = []
+        recipient_info = []
         for item in extra_data:
             if item.payer_or_recipient_status == 'payer':
-                payer.append(item.company_inn)
+                company = await company_crud.check_if_company_exists(
+                    company_inn=item.company_inn, session=session)
+
+                payer_info.append({'inn': item.company_inn, 'name': company.company_name})
+
             elif item.payer_or_recipient_status == 'recipient':
-                recipient.append(item.company_inn)
+                company = await company_crud.check_if_company_exists(
+                    company_inn=item.company_inn, session=session)
+                recipient_info.append({'inn': item.company_inn})
         result_app = ApplicationResponse(
-            target_date=app.target_date, cost=app.cost, inn_payer=payer, inn_recipient=recipient,
+            target_date=app.target_date, cost=app.cost, inn_payer=payer_info, inn_recipient=recipient_info,
             tg_user_id=app.tg_user_id, id=app.id
         )
         return result_app

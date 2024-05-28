@@ -30,8 +30,8 @@ main_router.include_router(
     tags=[TGUSER_ROUTER_TAG],
 )
 
-main_router.include_router(
-    user_router,
-    prefix=USER_ROUTER_PREFIX,
-    tags=[USER_ROUTER_TAG],
-)
+# main_router.include_router(
+#     user_router,
+#     prefix=USER_ROUTER_PREFIX,
+#     tags=[USER_ROUTER_TAG],
+# )
