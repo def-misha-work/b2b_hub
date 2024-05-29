@@ -22,8 +22,9 @@ fi
 # shellcheck disable=SC1083
 #uvicorn project.web.main:web --reload --host=0.0.0.0 --port="$PORT 8000"
 
-#alembic revision --autogenerate -m "Initianal migration" || echo "No changes to the database, skipping migration"
-#alembic upgrade head
+# alembic revision --autogenerate -m "Initianal migration"
+# alembic upgrade head
+
 uvicorn main:app --reload --host=0.0.0.0 --port=8000
 
 exec "$@"
