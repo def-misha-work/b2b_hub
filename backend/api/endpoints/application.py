@@ -39,7 +39,7 @@ async def get_application_by_id(
             elif item.payer_or_recipient_status == 'recipient':
                 company = await company_crud.check_if_company_exists(
                     company_inn=item.company_inn, session=session)
-                recipient_info.append({'inn': item.company_inn})
+                recipient_info.append({'inn': item.company_inn, 'name': company.company_name})
         result_app = ApplicationResponse(
             target_date=app.target_date, cost=app.cost, inn_payer=payer_info, inn_recipient=recipient_info,
             tg_user_id=app.tg_user_id, id=app.id
