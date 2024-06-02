@@ -13,6 +13,7 @@ load_dotenv()
 users = {
     os.getenv('BASIC_USER_LOGIN'): os.getenv('BASIC_USER_PASSWORD'),
     os.getenv('ADMIN_USER_LOGIN'): os.getenv('ADMIN_USER_PASSWORD')
+
 }
 
 

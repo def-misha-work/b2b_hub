@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ "$DATABASE" = "b2b_hub_db" ]
+if [ "$DATABASE" = "b2b_test_hub_db" ]
 then
     echo "Waiting for postgres..."
 
