@@ -24,11 +24,11 @@ class ApplicationBase(BaseModel):
 
 class ApplicationCreate(ApplicationBase):
     """Схема для создания заявки."""
-    inn_payer: List[int] = Field(
+    inn_payer: List = Field(
         ...,
-        description="Список ИНН плательщиков",
+        description="Список ИНН плательщиков с названиями",
     )
-    inn_recipient: List[int] = Field(
+    inn_recipient: List = Field(
         ...,
         description="Список ИНН получателей",
     )
