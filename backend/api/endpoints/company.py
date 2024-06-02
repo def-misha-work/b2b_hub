@@ -11,7 +11,7 @@ router = APIRouter()
 
 
 @router.patch(
-    '/{company_id}/update',
+    '/{company_inn}/update',
     response_model=CompanyUpdate,
     dependencies=[Depends(get_current_username)],
 )

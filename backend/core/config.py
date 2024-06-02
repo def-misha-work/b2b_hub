@@ -13,7 +13,6 @@ class Settings(BaseSettings):
     Если значений нет в файле .env, то считываются значения по умолчанию из constants."""
     app_title: str = APP_TITLE
     database_url: str
-    secret: str = os.getenv('SECRET')
     first_superuser_email: Optional[EmailStr] = None
     first_superuser_password: Optional[str] = None
 
