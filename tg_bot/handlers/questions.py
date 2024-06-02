@@ -8,7 +8,6 @@ from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
-
 from aiohttp import BasicAuth
 from dotenv import load_dotenv
 

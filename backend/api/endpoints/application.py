@@ -6,7 +6,6 @@ from api.validators import check_application_exists
 from constants import CLEAR_ROUTE
 from core.db import get_async_session
 from core.user import get_current_username
-
 from crud import application_crud, application_company_crud, company_crud
 from services.application_process import add_field_to_combined_table
 from schemas.application import ApplicationCreate, ApplicationResponse
