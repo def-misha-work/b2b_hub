@@ -235,7 +235,12 @@ async def get_target_date(message: types.Message, state: FSMContext):
     target_date = message.text
     application_storage.update_target_date(target_date)
     tg_username = message.from_user.username
+
     application_dict = application_storage.to_dict()
+    # TODO убрать костыль после доработки бека.
+    del application_dict['name_payer']
+    del application_dict['name_recipient']
+    
     application_id = False
     try:
         response = await make_post_request(
@@ -309,9 +314,9 @@ async def get_application_list(message: Message):
             answer = MESSAGES["application"].format(
                 application["id"],
                 *application["inn_payer"],
-                application["name_payer"],
+                # application["name_payer"],
                 *application["inn_recipient"],
-                application["name_recipient"],
+                # application["name_recipient"],
                 application["cost"],
                 application["target_date"],
             )
