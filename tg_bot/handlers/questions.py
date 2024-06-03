@@ -240,7 +240,7 @@ async def get_target_date(message: types.Message, state: FSMContext):
     # TODO убрать костыль после доработки бека.
     del application_dict['name_payer']
     del application_dict['name_recipient']
-    
+
     application_id = False
     try:
         response = await make_post_request(
