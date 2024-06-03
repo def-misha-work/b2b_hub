@@ -6,11 +6,11 @@ from schemas.user import UserBase
 router = APIRouter()
 
 
-@router.get("/me")
-def read_current_user(
-        user_data: UserBase = Depends(get_current_username)
-):
-    return {"username": user_data.username}
+# @router.get("/me")
+# def read_current_user(
+#         user_data: UserBase = Depends(get_current_username)
+# ):
+#     return {"username": user_data.username}
 
 
 @router.delete(

@@ -1,4 +1,6 @@
-﻿import logging
+﻿import os
+import aiohttp
+import logging
 import json
 
 from aiogram import Router, F, types
@@ -6,6 +8,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.types import Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiohttp import BasicAuth
 from dotenv import load_dotenv
 
 from keyboards.for_questions import get_menu
@@ -43,6 +46,15 @@ class NewApplication(StatesGroup):
     step_4 = State()
 
 
+# async def make_post_request_with_auth(url, username='basic_user', password=os.getenv('BASIC_USER_PASSWORD')):
+#     async with aiohttp.ClientSession() as session:
+#         async with session.post(url, auth=BasicAuth(username, password)) as response:
+#             if response.status == 200:
+#                 return await response.json()
+#             else:
+#                 return None
+
+
 @router.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
     """Запускает бота по команде /start. Выводит меню.
@@ -58,6 +70,9 @@ async def cmd_start(message: Message, state: FSMContext):
     user_dict = user_storage.to_dict()
 
     try:
+        # response_test = await make_post_request_with_auth(ENDPONT_CREATE_USER)
+        # if response_test:
+        #     logging.info(f"НАСТЯ АФИГЕТЬ ЧТО-ТО ПОЛУЧИЛОСЬ: {response_test}")
         response = await make_post_request(ENDPONT_CREATE_USER, user_dict)
         if response.status_code == 200:
             logging.info(f"""
@@ -82,7 +97,7 @@ async def cmd_start(message: Message, state: FSMContext):
 
     await message.answer(MESSAGES["start"].format(tg_name))
     await message.answer(MESSAGES["menu"], reply_markup=get_menu())
-    logging.info(f"Пользователь @{tg_username} в меню")
+    logging.info(f"Пользователь {tg_username} в меню")
 
 
 # Старт цепочки создание заявки step_1
@@ -243,6 +258,9 @@ async def get_target_date(message: types.Message, state: FSMContext):
 
     application_id = False
     try:
+        # response_test = await make_post_request_with_auth(ENDPONT_CREATE_APPLICATION)
+        # if response_test:
+        #     logging.info(f"НАСТЯ АФИГЕТЬ ЧТО-ТО ПОЛУЧИЛОСЬ: {response_test}")
         response = await make_post_request(
             ENDPONT_CREATE_APPLICATION, application_dict
         )
@@ -328,8 +346,8 @@ async def get_application_list(message: Message):
     else:
         await message.answer("У вас нет активных заявок.")
         logging.info("Пользователь получил список заявок (пустой)")
-    await message.answer(MESSAGES["menu"], reply_markup=get_menu())
-    logging.info("Пользователь в меню")
+        await message.answer(MESSAGES["menu"], reply_markup=get_menu())
+        logging.info("Пользователь в меню")
 
 
 @router.message(F.text.lower() == "мои юр. лица")
